@@ -64,11 +64,11 @@ export function Hero() {
             </div>
 
             <div className="absolute left-[6%] bottom-0 w-[36%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-              <Image src="https://images.unsplash.com/photo-1571907480495-4b26a4f1c1c9?w=600&q=80" alt="Mug personnalisé DadPrint" width={600} height={600} className="aspect-square w-full object-cover" />
+              <Image src="https://images.unsplash.com/photo-1570784332176-fdd73da66f03?w=600&q=80" alt="Mug personnalisé DadPrint" width={600} height={600} className="aspect-square w-full object-cover" />
             </div>
 
             <div className="absolute bottom-[4%] right-[2%] w-[44%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-              <Image src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=700&q=80" alt="Roll-up et signalétique DadPrint" width={700} height={700} className="aspect-square w-full object-cover" />
+              <Image src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?w=700&q=80" alt="Roll-up et signalétique DadPrint" width={700} height={700} className="aspect-square w-full object-cover" />
             </div>
 
             <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-1.5 rounded-full bg-white p-2 shadow-card">

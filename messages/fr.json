@@ -122,7 +122,8 @@
     "wizard": "Assistant projet",
     "blog": "Conseils & inspirations",
     "faq": "FAQ",
-    "newsletterSuccess": "Merci, vous êtes inscrit !"
+    "newsletterSuccess": "Merci, vous êtes inscrit !",
+    "paymentMethodsTitle": "Moyens de paiement acceptés"
   },
   "floating": {
     "whatsapp": "Discuter sur WhatsApp",

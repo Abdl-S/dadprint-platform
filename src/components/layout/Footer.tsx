@@ -28,7 +28,7 @@ export function Footer() {
       <Container className="py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-1">
-            <Logo size="sm" href={null} />
+            <Logo size="sm" href={null} onDark />
             <p className="mt-4 max-w-xs text-sm text-paper/60">{t('tagline')}</p>
             <div className="mt-5 flex gap-2.5">
               <a href="#" aria-label="Instagram" className="flex h-9 w-9 items-center justify-center rounded-full border border-paper/15">
@@ -73,12 +73,15 @@ export function Footer() {
               <li>contact@dadprint.mr</li>
               <li>Nouakchott, Mauritanie</li>
             </ul>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {paymentProviders.filter((p) => p.enabled).map((p) => (
-                <span key={p.id} className="rounded-sm bg-paper/10 px-2.5 py-1 text-xs font-semibold">
-                  {p.label}
-                </span>
-              ))}
+            <div className="mt-5">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-paper/40">{t('paymentMethodsTitle')}</p>
+              <div className="flex flex-wrap gap-2">
+                {paymentProviders.filter((p) => p.enabled).map((p) => (
+                  <span key={p.id} className="rounded-sm bg-paper/10 px-2.5 py-1 text-xs font-semibold">
+                    {p.label}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

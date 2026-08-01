@@ -21,6 +21,15 @@ export default async function ComptePage({ params: { locale } }: { params: { loc
     redirect(`/${locale}/connexion?next=/compte`);
   }
 
-  const orders = await getMyOrders();
-  return <ComptePageClient orders={orders} />;
+  const [orders, { data: profile }] = await Promise.all([
+    getMyOrders(),
+    supabase.from('dp_profiles').select('full_name, phone, email').eq('id', user!.id).single(),
+  ]);
+
+  return (
+    <ComptePageClient
+      orders={orders}
+      profile={{ name: profile?.full_name ?? '', phone: profile?.phone ?? '', email: profile?.email ?? user!.email ?? '' }}
+    />
+  );
 }

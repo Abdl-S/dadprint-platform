@@ -122,7 +122,8 @@
     "wizard": "Project wizard",
     "blog": "Tips & inspiration",
     "faq": "FAQ",
-    "newsletterSuccess": "Thanks, you're subscribed!"
+    "newsletterSuccess": "Thanks, you're subscribed!",
+    "paymentMethodsTitle": "Accepted payment methods"
   },
   "floating": {
     "whatsapp": "Chat on WhatsApp",

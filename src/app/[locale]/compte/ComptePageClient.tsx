@@ -27,21 +27,24 @@ type Tab = 'profil' | 'devis' | 'paiements' | 'fichiers' | 'marques' | 'favoris'
  * prêtes à être remplacées par de vraies requêtes Supabase liées à une
  * session authentifiée, sans changer cette mise en page.
  */
-export function ComptePageClient({ orders }: { orders: MyOrder[] }) {
+export function ComptePageClient({ orders, profile }: { orders: MyOrder[]; profile: { name: string; phone: string; email: string } }) {
   return (
     <Suspense fallback={null}>
-      <ComptePageContent orders={orders} />
+      <ComptePageContent orders={orders} profile={profile} />
     </Suspense>
   );
 }
 
-function ComptePageContent({ orders }: { orders: MyOrder[] }) {
+function ComptePageContent({ orders, profile }: { orders: MyOrder[]; profile: { name: string; phone: string; email: string } }) {
   const t = useTranslations('accountPage');
   const locale = useLocale() as Locale;
   const searchParams = useSearchParams();
   const router = useRouter();
   const { signOut } = useAuth();
   const [tab, setTab] = useState<Tab>('profil');
+  const [name, setName] = useState(profile.name);
+  const [phone, setPhone] = useState(profile.phone);
+  const [savingProfile, setSavingProfile] = useState(false);
   const { favorites } = useFavorites();
 
   useEffect(() => {
@@ -69,7 +72,6 @@ function ComptePageContent({ orders }: { orders: MyOrder[] }) {
       <Container>
         <h1 className="text-4xl font-black">{t('title')}</h1>
         <p className="mt-3 text-ink-70">{t('subtitle')}</p>
-        <div className="mt-4 rounded-md bg-ink-8 p-3 text-xs text-ink-70">{t('authNote')}</div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[220px_1fr]">
           <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
@@ -92,14 +94,25 @@ function ComptePageContent({ orders }: { orders: MyOrder[] }) {
 
           <div>
             {tab === 'profil' && (
-              <form className="max-w-md space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <form
+                className="max-w-md space-y-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setSavingProfile(true);
+                  await fetch('/api/account/profile', {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone }),
+                  });
+                  setSavingProfile(false);
+                }}
+              >
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <input placeholder={t('fields.name')} defaultValue="Client Démo" className="rounded-md border border-ink-15 p-3 text-sm" />
-                  <input placeholder={t('fields.phone')} defaultValue="+222 00 00 00 00" className="rounded-md border border-ink-15 p-3 text-sm" />
+                  <input placeholder={t('fields.name')} value={name} onChange={(e) => setName(e.target.value)} className="rounded-md border border-ink-15 p-3 text-sm" />
+                  <input placeholder={t('fields.phone')} value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-md border border-ink-15 p-3 text-sm" />
                 </div>
-                <input placeholder={t('fields.email')} defaultValue="client@exemple.mr" className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+                <input placeholder={t('fields.email')} defaultValue={profile.email} disabled className="w-full rounded-md border border-ink-15 bg-ink-8/40 p-3 text-sm text-ink-40" />
                 <div className="flex gap-3">
-                  <Button type="submit" variant="magenta">{t('save')}</Button>
+                  <Button type="submit" variant="magenta" loading={savingProfile} disabled={savingProfile}>{t('save')}</Button>
                   <Button type="button" variant="outline" onClick={() => { signOut(); router.push('/'); }}>{t('signOut')}</Button>
                 </div>
               </form>

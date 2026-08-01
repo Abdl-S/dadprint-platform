@@ -11,10 +11,10 @@ export function AboutIntro() {
   return (
     <Section className="pb-0">
       <Container>
-        <Reveal className="mx-auto max-w-2xl text-center">
+        <Reveal className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <Logo size="sm" href={null} />
-          <p className="mt-6 text-xl font-semibold leading-relaxed sm:text-2xl">{t('statement')}</p>
-          <p className="mt-4 text-ink-70">{t('description')}</p>
+          <p className="mt-6 font-sans text-xl font-semibold leading-relaxed sm:text-2xl">{t('statement')}</p>
+          <p className="mt-4 font-sans text-ink-70">{t('description')}</p>
         </Reveal>
       </Container>
     </Section>

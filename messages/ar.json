@@ -122,7 +122,8 @@
     "wizard": "مساعد المشروع",
     "blog": "نصائح وإلهام",
     "faq": "الأسئلة الشائعة",
-    "newsletterSuccess": "شكراً، تم اشتراكك!"
+    "newsletterSuccess": "شكراً، تم اشتراكك!",
+    "paymentMethodsTitle": "وسائل الدفع المقبولة"
   },
   "floating": {
     "whatsapp": "الدردشة عبر واتساب",
