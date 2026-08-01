@@ -7,6 +7,7 @@ import { AdminModal } from '@/components/admin/AdminModal';
 import { Toggle } from '@/components/admin/Toggle';
 import { FormFieldBuilder } from '@/components/admin/FormFieldBuilder';
 import { StatusBadge } from '@/components/admin/StatusBadge';
+import { AdminImageUpload } from '@/components/admin/AdminImageUpload';
 import type { Category } from '@/types';
 import type { Product, PricingMode } from '@/types';
 
@@ -177,7 +178,10 @@ export function AdminProduitsClient({ initialProducts, categories }: { initialPr
                 <select aria-label="Catégorie" value={editing.categorySlug} onChange={(e) => setEditing({ ...editing, categorySlug: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm">
                   {categories.map((c) => <option key={c.slug} value={c.slug}>{c.parentSlug ? '↳ ' : ''}{c.name.fr}</option>)}
                 </select>
-                <input placeholder="URL image galerie (une ligne = une image)" aria-label="URL image galerie (une ligne = une image)" value={editing.images.join(', ')} onChange={(e) => setEditing({ ...editing, images: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+                <div>
+                  <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-ink-40">Images du produit</p>
+                  <AdminImageUpload images={editing.images} onChange={(images) => setEditing({ ...editing, images })} />
+                </div>
                 <input placeholder="URL vidéo (optionnel)" aria-label="URL vidéo (optionnel)" value={editing.videoUrl ?? ''} onChange={(e) => setEditing({ ...editing, videoUrl: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
                 <input placeholder="Délai (ex : 48h)" aria-label="Délai (ex : 48h)" value={editing.delay?.fr ?? ''} onChange={(e) => setEditing({ ...editing, delay: { fr: e.target.value, en: e.target.value, ar: e.target.value } })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
               </div>
