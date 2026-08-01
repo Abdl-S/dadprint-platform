@@ -51,7 +51,7 @@ export function AdminImageUpload({
       uploaded.push(data.publicUrl);
     }
 
-    if (uploaded.length > 0) onChange([...images, ...uploaded]);
+    if (uploaded.length > 0) onChange([...uploaded, ...images]);
     setUploading(false);
   }
 
@@ -82,9 +82,14 @@ export function AdminImageUpload({
 
       {images.length > 0 && (
         <div className="grid grid-cols-4 gap-2">
-          {images.map((url) => (
+          {images.map((url, i) => (
             <div key={url} className="group relative aspect-square overflow-hidden rounded-md border border-ink-15">
               <img src={url} alt="" className="h-full w-full object-cover" />
+              {i === 0 && (
+                <span className="absolute bottom-1 start-1 rounded-full bg-brand-magenta px-2 py-0.5 text-[10px] font-bold text-white">
+                  Principale
+                </span>
+              )}
               <button
                 type="button" onClick={() => removeImage(url)}
                 className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-ink/70 text-paper opacity-0 transition-opacity group-hover:opacity-100"
