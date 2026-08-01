@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { Instagram, Facebook } from 'lucide-react';
+import { Instagram, Facebook, Lock } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Container } from '@/components/ui/Container';
 import { Link } from '@/i18n/navigation';
@@ -94,9 +94,12 @@ export function Footer() {
 
         <div className="mt-8 flex flex-col gap-3 border-t border-paper/10 pt-6 font-mono text-xs text-paper/40 sm:flex-row sm:items-center sm:justify-between">
           <span>© {year} DadPrint — {t('rights')}</span>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-4">
             <Link href="/confidentialite" className="hover:text-paper/70">{t('privacy')}</Link>
             <Link href="/conditions-generales" className="hover:text-paper/70">{t('terms')}</Link>
+            <Link href="/admin" className="text-paper/25 hover:text-paper/60" aria-label="Espace administration" title="Espace administration">
+              <Lock size={12} />
+            </Link>
           </div>
         </div>
       </Container>
