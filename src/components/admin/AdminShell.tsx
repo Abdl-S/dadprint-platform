@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+// pathname vient de '@/i18n/navigation' (voir import ci-dessus) — jamais préfixé par la langue, cohérent avec les hrefs bruts du menu
+import { Link, usePathname } from '@/i18n/navigation';
 import {
   LayoutDashboard, FolderTree, Package, Boxes, PenTool, FileText, ShoppingCart,
   Users, Star, Image as ImageIcon, Building2, Newspaper, Mail, FileEdit, Settings,
