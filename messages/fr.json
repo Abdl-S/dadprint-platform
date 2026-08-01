@@ -1,0 +1,499 @@
+{
+  "nav": {
+    "produits": "Produits",
+    "realisations": "Réalisations",
+    "clients": "Nos clients",
+    "devis": "Devis",
+    "entreprises": "Entreprises",
+    "aPropos": "À propos",
+    "contact": "Contact",
+    "compte": "Mon compte",
+    "commander": "Commander",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "callShort": "Appeler",
+    "quickActions": "Actions rapides",
+    "packs": "Packs",
+    "accueil": "Accueil",
+    "services": "Services",
+    "requestQuote": "Demander un devis"
+  },
+  "home": {
+    "heroTag": "Atelier d'impression — Nouakchott, Mauritanie",
+    "heroTitle": "Commandez sans vous déplacer.",
+    "heroSubtitle": "Cartes, textile, objets publicitaires, grand format — DadPrint transforme votre image en une marque inoubliable, du premier croquis à la livraison.",
+    "ctaPrimary": "Commander maintenant",
+    "ctaSecondary": "Voir nos réalisations",
+    "ctaWhatsapp": "Commander sur WhatsApp",
+    "ctaCall": "Appeler",
+    "trustLine": "Réponse sous 1h en général — sans engagement",
+    "heroLine1": "L'impression professionnelle",
+    "heroHighlight": "qui donne vie",
+    "heroLine2": "à vos idées.",
+    "paletteCardTitle": "Palette du projet",
+    "stats": {
+      "ordersValue": "1200+",
+      "ordersLabel": "Commandes livrées",
+      "delayValue": "48h",
+      "delayLabel": "Délai moyen",
+      "satisfactionValue": "4.9/5",
+      "satisfactionLabel": "Satisfaction client"
+    }
+  },
+  "advantages": {
+    "delivery": "Livraison partout en Mauritanie",
+    "delay": "Délai annoncé avant impression",
+    "design": "Aide à la conception incluse",
+    "quality": "Impression premium contrôlée"
+  },
+  "whyUs": {
+    "eyebrow": "Pourquoi DadPrint",
+    "title": "Une expérience pensée pour vous faire gagner du temps",
+    "description": "DadPrint n'est pas qu'une imprimerie : c'est une plateforme complète pensée pour que vous n'ayez jamais besoin de vous déplacer.",
+    "point1": "Tout se commande en ligne, du choix du produit au paiement",
+    "point2": "Un formulaire adapté à chaque produit, jamais générique",
+    "point3": "Suivi de production transparent à chaque étape",
+    "point4": "Des moyens de paiement mauritaniens que vous utilisez déjà"
+  },
+  "howItWorks": {
+    "eyebrow": "Le déroulé",
+    "title": "Comment ça fonctionne",
+    "step1Title": "Découvrez",
+    "step1Desc": "Parcourez le catalogue et choisissez toutes les options du produit.",
+    "step2Title": "Envoyez",
+    "step2Desc": "Fichier prêt ou besoin d'aide au design — les deux sont possibles.",
+    "step3Title": "Validez",
+    "step3Desc": "Recevez votre devis, validez la commande et payez en ligne.",
+    "step4Title": "Recevez",
+    "step4Desc": "Suivez la production et choisissez livraison ou retrait."
+  },
+  "categories": {
+    "eyebrow": "Catalogue",
+    "title": "Nos catégories",
+    "seeAll": "Voir tout le catalogue →",
+    "products": "produits"
+  },
+  "realisations": {
+    "eyebrow": "Portfolio",
+    "title": "Nos meilleures réalisations",
+    "seeAll": "Voir tout le portfolio →"
+  },
+  "trustedCompanies": {
+    "title": "Ils nous font confiance"
+  },
+  "testimonials": {
+    "eyebrow": "Témoignages",
+    "title": "Avis clients",
+    "verified": "Avis vérifié",
+    "seeAll": "Voir tous les avis →"
+  },
+  "faq": {
+    "eyebrow": "Questions",
+    "title": "Questions fréquentes",
+    "pageSubtitle": "Tout ce qu'on nous demande le plus souvent."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Une question ? Écrivez-nous",
+    "description": "Notre équipe vous répond rapidement, en français, anglais ou arabe.",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "email": "Email",
+    "message": "Votre message",
+    "send": "Envoyer le message"
+  },
+  "footer": {
+    "tagline": "L'impression premium, sans vous déplacer.",
+    "rights": "Tous droits réservés.",
+    "navTitle": "Navigation",
+    "contactTitle": "Contact",
+    "paymentTitle": "Moyens de paiement",
+    "usefulTitle": "Utile",
+    "howItWorks": "Comment ça fonctionne",
+    "ourServices": "Nos services",
+    "reviews": "Avis clients",
+    "newsletterTitle": "Restez informé",
+    "newsletterDesc": "Nouveautés et offres, sans spam.",
+    "newsletterPlaceholder": "Votre email",
+    "newsletterSubmit": "S'inscrire",
+    "privacy": "Confidentialité",
+    "terms": "Conditions générales",
+    "tracking": "Suivre ma commande",
+    "wizard": "Assistant projet",
+    "blog": "Conseils & inspirations",
+    "faq": "FAQ",
+    "newsletterSuccess": "Merci, vous êtes inscrit !"
+  },
+  "floating": {
+    "whatsapp": "Discuter sur WhatsApp",
+    "call": "Appeler DadPrint"
+  },
+  "catalog": {
+    "title": "Nos produits",
+    "subtitle": "Un catalogue complet, filtrable par catégorie — du textile au grand format.",
+    "all": "Tout",
+    "empty": "Aucun produit dans cette catégorie pour le moment."
+  },
+  "product": {
+    "breadcrumbCatalog": "Catalogue",
+    "from": "À partir de",
+    "quoteOnly": "Sur devis",
+    "delay": "Délai",
+    "minQty": "Quantité minimale",
+    "reviews": "avis",
+    "faqTitle": "Questions sur ce produit",
+    "relatedWork": "Réalisations liées",
+    "relatedProducts": "Produits similaires",
+    "tipsTitle": "Conseils",
+    "complementaryTitle": "Complète ton projet",
+    "complementarySubtitle": "Souvent commandés ensemble avec ce produit."
+  },
+  "orderForm": {
+    "title": "Configurez votre commande",
+    "deliveryQuestion": "Livraison ou retrait ?",
+    "delivery": "Livraison",
+    "pickup": "Retrait à l'atelier",
+    "submit": "Commander sur WhatsApp →",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "city": "Ville",
+    "instructions": "Instructions particulières (optionnel)",
+    "confirmedTitle": "Commande envoyée !",
+    "confirmedDesc": "On vous répond rapidement sur WhatsApp. Gardez cette référence pour suivre votre commande.",
+    "trackCta": "Suivre ma commande",
+    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez."
+  },
+  "designStep": {
+    "question": "Possédez-vous déjà votre design ?",
+    "hasDesign": "Oui, j'ai mon fichier",
+    "needsDesign": "Non, j'ai besoin d'aide",
+    "needsEdit": "J'ai besoin d'une modification",
+    "uploadPrompt": "Téléversez votre fichier ci-dessous.",
+    "briefPrompt": "Décrivez votre idée, on s'occupe de la création.",
+    "briefPlaceholder": "Couleurs, style, texte à inclure, exemples qui vous plaisent...",
+    "editUploadPrompt": "Téléversez le fichier existant à modifier.",
+    "editDescriptionPlaceholder": "Décrivez précisément les modifications souhaitées"
+  },
+  "upload": {
+    "dropText": "Cliquez ou déposez vos fichiers ici",
+    "maxSize": "25 Mo max par fichier"
+  },
+  "quotePage": {
+    "title": "Demander un devis",
+    "subtitle": "Un devis précis en une seule fois — toutes les infos utiles, envoyées d'un coup.",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "email": "Email",
+    "city": "Ville",
+    "address": "Adresse",
+    "product": "Produit concerné",
+    "otherProduct": "Autre / je ne sais pas encore",
+    "options": "Options souhaitées",
+    "optionsPlaceholder": "Format, couleurs, quantité approximative...",
+    "desiredDate": "Date souhaitée",
+    "files": "Fichiers",
+    "comments": "Commentaires",
+    "submit": "Envoyer ma demande sur WhatsApp →",
+    "reassurance": "Réponse sous 1h en général — sans engagement",
+    "country": "Pays",
+    "deliveryAddress": "Adresse de livraison",
+    "deliveryAddressPlaceholder": "Si différente de l'adresse ci-dessus",
+    "confirmedTitle": "Devis envoyé !",
+    "confirmedDesc": "Notre équipe vous répond rapidement sur WhatsApp avec un prix précis.",
+    "trackCta": "Suivre ma demande",
+    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez."
+  },
+  "portfolioPage": {
+    "title": "Nos réalisations",
+    "subtitle": "Une sélection de projets livrés récemment, par catégorie.",
+    "all": "Tout",
+    "empty": "Aucune réalisation dans cette catégorie pour le moment.",
+    "showBefore": "Voir avant",
+    "showAfter": "Voir après",
+    "beforeAfterBadge": "Avant / Après",
+    "relatedTitle": "Autres réalisations",
+    "viewProject": "Voir le projet"
+  },
+  "clientsPage": {
+    "title": "Ils nous font confiance",
+    "subtitle": "Des entreprises mauritaniennes qui nous confient leur communication visuelle.",
+    "visitSite": "Voir leur site",
+    "workDoneTitle": "Réalisations pour cette entreprise",
+    "eyebrow": "Confiance",
+    "realisationsTitle": "Nos réalisations pour eux",
+    "testimonialsTitle": "Ce qu'ils en disent"
+  },
+  "satisfaction": {
+    "title": "Votre avis compte",
+    "subtitle": "Votre commande a été livrée — dites-nous comment s'est passée l'expérience.",
+    "quality": "Qualité",
+    "delay": "Délais",
+    "communication": "Communication",
+    "delivery": "Livraison",
+    "design": "Design",
+    "commentPlaceholder": "Un commentaire à ajouter ?",
+    "submit": "Envoyer mon avis",
+    "moderationNote": "Votre avis sera publié après vérification.",
+    "thanksTitle": "Merci pour votre retour !",
+    "thanksDesc": "Votre avis nous aide à nous améliorer et sera publié après vérification.",
+    "photosLabel": "Ajouter des photos (optionnel)",
+    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "comingSoon": "Bientôt disponible",
+    "language": "Langue"
+  },
+  "pwa": {
+    "installMessage": "Installez DadPrint pour un accès plus rapide, comme une app.",
+    "install": "Installer",
+    "dismiss": "Fermer"
+  },
+  "aboutIntro": {
+    "statement": "DadPrint accompagne vos projets de A à Z : création graphique, impression et livraison, entièrement en ligne.",
+    "description": "Depuis Nouakchott, nous imprimons pour les particuliers, associations et entreprises qui veulent un résultat professionnel sans perdre de temps."
+  },
+  "servicesOverview": {
+    "eyebrow": "Nos services",
+    "title": "Ce que nous faisons pour vous",
+    "designTitle": "Création graphique",
+    "designDesc": "Une idée suffit — notre équipe conçoit le visuel adapté à votre projet.",
+    "printTitle": "Impression",
+    "printDesc": "Un contrôle qualité à chaque étape, du fichier à la sortie machine.",
+    "deliveryTitle": "Livraison",
+    "deliveryDesc": "Partout en Mauritanie, ou retrait à l'atelier si vous préférez.",
+    "supportTitle": "Accompagnement",
+    "supportDesc": "Une équipe joignable à chaque étape, du devis à la livraison."
+  },
+  "servicesPage": {
+    "title": "Nos services",
+    "subtitle": "Quatre piliers, un seul objectif : vous simplifier la communication visuelle.",
+    "ctaCatalog": "Voir le catalogue",
+    "ctaQuote": "Demander un devis"
+  },
+  "aboutPage": {
+    "title": "À propos de DadPrint",
+    "intro": "DadPrint est né d'une conviction simple : commander de l'impression professionnelle ne devrait jamais obliger à se déplacer, attendre, ou deviner un prix.",
+    "designTitle": "Création graphique",
+    "designDesc": "Nous concevons vos visuels si vous n'avez pas encore de fichier prêt.",
+    "printTitle": "Impression",
+    "printDesc": "Un atelier équipé pour le petit comme le grand format.",
+    "deliveryTitle": "Livraison",
+    "deliveryDesc": "Partout en Mauritanie, avec un délai annoncé à l'avance.",
+    "supportTitle": "Accompagnement",
+    "supportDesc": "Une équipe disponible du premier message à la livraison.",
+    "mission": "Notre priorité n'est pas de vendre de l'impression — c'est votre satisfaction, à chaque commande.",
+    "ctaCatalog": "Découvrir le catalogue",
+    "ctaContact": "Nous contacter"
+  },
+  "howItWorksPage": {
+    "eyebrow": "Le parcours",
+    "title": "Comment ça fonctionne",
+    "subtitle": "De la découverte du produit à l'avis laissé après livraison — tout est pensé pour rester simple.",
+    "discoverTitle": "Découvrez",
+    "discoverDesc": "Parcourez le catalogue ou recherchez directement ce qu'il vous faut.",
+    "customizeTitle": "Personnalisez",
+    "customizeDesc": "Choisissez vos options et envoyez votre fichier, ou demandez notre aide pour le créer.",
+    "quoteTitle": "Recevez un devis",
+    "quoteDesc": "Un prix clair, envoyé rapidement, sans engagement.",
+    "payTitle": "Payez en ligne",
+    "payDesc": "Avec les moyens de paiement mauritaniens que vous utilisez déjà.",
+    "trackTitle": "Suivez la production",
+    "trackDesc": "Livraison à domicile ou retrait à l'atelier, à votre choix.",
+    "reviewTitle": "Partagez votre avis",
+    "reviewDesc": "Votre retour nous aide à nous améliorer à chaque commande.",
+    "cta": "Découvrir le catalogue"
+  },
+  "reviewsPage": {
+    "title": "Avis clients",
+    "subtitle": "Ce que nos clients disent de leurs commandes, sans filtre.",
+    "basedOn": "Basé sur {count} avis",
+    "leaveReview": "Laisser un avis →"
+  },
+  "contactPage": {
+    "title": "Contactez-nous",
+    "subtitle": "Une question avant de commander ? Notre équipe vous répond rapidement.",
+    "phoneLabel": "Téléphone",
+    "whatsappCta": "Discuter sur WhatsApp",
+    "addressLabel": "Adresse",
+    "hoursLabel": "Horaires",
+    "hoursValue": "Dimanche – Jeudi, 9h – 18h",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "email": "Email",
+    "subject": "Sujet",
+    "message": "Votre message",
+    "send": "Envoyer le message"
+  },
+  "privacyPage": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : juillet 2026",
+    "dataCollectedTitle": "Données collectées",
+    "dataCollectedBody": "Nous collectons les informations que vous nous fournissez volontairement : nom, téléphone, email, adresse et fichiers transmis lors d'une commande ou d'un devis.",
+    "dataUseTitle": "Utilisation des données",
+    "dataUseBody": "Ces données servent uniquement à traiter vos commandes, devis et demandes de contact, et à vous tenir informé de leur avancement.",
+    "dataSharingTitle": "Partage des données",
+    "dataSharingBody": "Vos données ne sont jamais vendues. Elles peuvent être partagées avec nos prestataires de livraison ou de paiement, uniquement pour l'exécution de votre commande.",
+    "dataStorageTitle": "Conservation",
+    "dataStorageBody": "Les données sont conservées le temps nécessaire au traitement de votre commande et au respect de nos obligations légales.",
+    "rightsTitle": "Vos droits",
+    "rightsBody": "Vous pouvez à tout moment demander l'accès, la correction ou la suppression de vos données en nous contactant.",
+    "contactTitle": "Contact",
+    "contactBody": "Pour toute question relative à vos données : contact@dadprint.mr"
+  },
+  "termsPage": {
+    "title": "Conditions générales de vente",
+    "lastUpdated": "Dernière mise à jour : juillet 2026",
+    "objectTitle": "Objet",
+    "objectBody": "Les présentes conditions régissent toute commande passée sur la plateforme DadPrint.",
+    "ordersTitle": "Commandes",
+    "ordersBody": "Toute commande est confirmée après validation du devis et réception des fichiers nécessaires à l'impression.",
+    "pricingTitle": "Tarifs",
+    "pricingBody": "Les prix sont indiqués en MRU. Certains produits sont facturés sur devis selon les options choisies.",
+    "paymentTitle": "Paiement",
+    "paymentBody": "Le paiement s'effectue via l'un des moyens disponibles sur la plateforme (Bankily, Masrivi, Sedad, Click, BIM Bank, Amanty).",
+    "deliveryTitle": "Livraison",
+    "deliveryBody": "La livraison est proposée partout en Mauritanie ; le retrait à l'atelier reste possible à tout moment.",
+    "designTitle": "Création graphique",
+    "designBody": "Toute création graphique réalisée par DadPrint reste soumise à validation du client avant impression.",
+    "liabilityTitle": "Responsabilité",
+    "liabilityBody": "DadPrint ne peut être tenu responsable des erreurs présentes dans un fichier fourni par le client et validé par celui-ci avant impression.",
+    "contactTitle": "Contact",
+    "contactBody": "Pour toute question : contact@dadprint.mr"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Cette page n'existe pas ou plus. Elle a peut-être changé d'adresse.",
+    "ctaHome": "Retour à l'accueil",
+    "ctaCatalog": "Voir le catalogue"
+  },
+  "payment": {
+    "chooseMethod": "Moyen de paiement",
+    "proofHint": "Envoyez votre preuve de paiement {method} ci-dessous."
+  },
+  "tracking": {
+    "steps": {
+      "devis": "Devis",
+      "commande": "Commande validée",
+      "paiement": "Paiement",
+      "conception": "Conception graphique",
+      "validation_bat": "Validation BAT",
+      "production": "Production",
+      "controle_qualite": "Contrôle qualité",
+      "livraison": "Livraison",
+      "demande_recue": "Demande reçue",
+      "devis_envoye": "Devis envoyé",
+      "paiement_valide": "Paiement validé",
+      "impression": "Impression",
+      "terminee": "Commande terminée"
+    },
+    "inProgress": "En cours"
+  },
+  "trackingPage": {
+    "title": "Suivre ma demande",
+    "subtitle": "Entrez votre numéro de référence pour voir l'avancement.",
+    "placeholder": "Ex : DP-CMD-20260728-1042",
+    "demoHint": "Exemple à tester :",
+    "notFound": "Aucune commande trouvée avec ce numéro. Vérifiez la référence reçue par WhatsApp."
+  },
+  "batPage": {
+    "title": "Validation de votre maquette",
+    "versionLabel": "Version",
+    "subtitle": "Voici le bon à tirer pour {product}. Vérifiez bien avant de valider.",
+    "approveCta": "Approuver",
+    "requestChangesCta": "Demander une modification",
+    "commentLabel": "Commentaire (optionnel)",
+    "commentPlaceholder": "Précisez ce qui doit changer si besoin",
+    "approvedTitle": "Maquette approuvée !",
+    "approvedDesc": "Merci — la production va démarrer.",
+    "changesRequestedTitle": "Modification demandée",
+    "changesRequestedDesc": "Notre équipe vous recontacte pour ajuster la maquette.",
+    "zoomCta": "Zoomer",
+    "downloadCta": "Télécharger"
+  },
+  "accountPage": {
+    "title": "Mon compte",
+    "subtitle": "Retrouvez vos devis et commandes, et recommandez en un clic.",
+    "trackCta": "Suivre →",
+    "reorderCta": "Recommander",
+    "authNote": "Espace de démonstration — la connexion par compte client sera activée avec l'administration.",
+    "tabs": {
+      "profil": "Profil",
+      "devis": "Devis & commandes",
+      "paiements": "Paiements & factures",
+      "fichiers": "Fichiers & logos",
+      "marques": "Mes marques",
+      "favoris": "Favoris",
+      "avis": "Mes avis",
+      "adresses": "Adresses",
+      "notifications": "Notifications"
+    },
+    "fields": {
+      "name": "Nom complet",
+      "phone": "Téléphone",
+      "email": "Email"
+    },
+    "invoiceStatus": {
+      "payee": "Payée",
+      "en_attente": "En attente"
+    },
+    "save": "Enregistrer",
+    "fonts": "Polices",
+    "addBrand": "+ Ajouter une marque",
+    "noFavorites": "Aucun favori pour le moment — cliquez sur le cœur d'un produit pour l'ajouter ici.",
+    "default": "Par défaut",
+    "addAddress": "+ Ajouter une adresse",
+    "noOrders": "Aucune commande pour le moment.",
+    "signOut": "Se déconnecter"
+  },
+  "packsPage": {
+    "eyebrow": "Packs intelligents",
+    "title": "Nos Packs",
+    "subtitle": "Des combinaisons de produits pensées pour votre projet — personnalisables à volonté.",
+    "productsIncluded": "produits inclus",
+    "customize": "Personnalisez votre pack",
+    "requestQuoteCta": "Demander un devis global →",
+    "orderPackCta": "Commander le pack complet →"
+  },
+  "wizardPage": {
+    "eyebrow": "Assistant de démarrage",
+    "question": "Quel est votre projet ?",
+    "recommendationTitle": "Ce qu'on recommande pour : {project}",
+    "recommendedPack": "Pack recommandé",
+    "generateQuoteCta": "Générer mon devis complet →"
+  },
+  "blogPage": {
+    "eyebrow": "Blog",
+    "title": "Conseils & Inspirations",
+    "subtitle": "Guides, tutoriels et conseils pratiques pour réussir vos projets d'impression.",
+    "relatedTitle": "À lire aussi",
+    "categories": {
+      "conseils-impression": "Conseils impression",
+      "conseils-design": "Conseils design",
+      "guides": "Guides",
+      "tutoriels": "Tutoriels"
+    }
+  },
+  "authPage": {
+    "loginTitle": "Connexion",
+    "loginSubtitle": "Accédez à vos commandes et devis.",
+    "email": "Email",
+    "password": "Mot de passe",
+    "loginCta": "Se connecter",
+    "loginError": "Email ou mot de passe incorrect.",
+    "noAccount": "Pas encore de compte ?",
+    "signupLink": "S'inscrire",
+    "signupTitle": "Créer un compte",
+    "signupSubtitle": "Suivez vos commandes en un seul endroit.",
+    "fullName": "Nom complet",
+    "phone": "Téléphone",
+    "signupCta": "Créer mon compte",
+    "signupError": "Une erreur est survenue. Réessayez.",
+    "emailTaken": "Cet email est déjà utilisé.",
+    "hasAccount": "Déjà un compte ?",
+    "loginLink": "Se connecter",
+    "checkEmailTitle": "Vérifiez votre email",
+    "checkEmailDesc": "Un lien de confirmation vous a été envoyé pour activer votre compte."
+  }
+}

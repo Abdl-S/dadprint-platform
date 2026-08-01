@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Variables de marque exposées en CSS natif (en plus des tokens Tailwind).
+ * Utile pour les composants qui ont besoin d'accéder à la couleur en dehors
+ * des classes utilitaires (canvas, SVG dynamiques, dégradés custom...).
+ */
+:root {
+  --color-ink: #221e1f;
+  --color-paper: #fbfaf7;
+  --color-magenta: #ea0e8a;
+  --color-cyan: #15a1d6;
+  --color-yellow: #efeb41;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hiérarchie typographique premium — titres resserrés et confiants,
+   paragraphes aérés pour rester très lisibles à toute taille d'écran. */
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+p {
+  line-height: 1.65;
+}
+
+/* Sélection de texte teintée à la marque plutôt que le bleu par défaut du navigateur */
+::selection {
+  background-color: var(--color-magenta);
+  color: #fff;
+}
+
+/* Scrollbar discrète, cohérente avec l'identité (webkit uniquement, dégradation propre ailleurs) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D8D4D1; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #8A8583; }
+
+/* Respect des préférences de mouvement réduit — accessibilité non négociable */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus visible clavier — jamais supprimé, seulement restylé */
+:focus-visible {
+  outline: 2px solid var(--color-magenta);
+  outline-offset: 2px;
+}
+
+/* Support RTL : les composants utilisent les classes logiques Tailwind
+   (ps-/pe-/ms-/me-/text-start/text-end) plutôt que left/right pour que
+   l'arabe s'inverse automatiquement sans code dupliqué. */
+[dir='rtl'] .flip-rtl {
+  transform: scaleX(-1);
+}
