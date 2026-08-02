@@ -6,7 +6,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import {
   LayoutDashboard, FolderTree, Package, Boxes, PenTool, FileText, ShoppingCart,
   Users, Star, Image as ImageIcon, Building2, Newspaper, Mail, FileEdit, Settings,
-  CreditCard, ShieldCheck, BarChart3, Sparkles, Menu, X, LogOut, Bell, Receipt,
+  CreditCard, ShieldCheck, BarChart3, Sparkles, Menu, X, LogOut, Bell, Receipt, HelpCircle,
 } from 'lucide-react';
 import { useAdminAuth, type AdminRole } from '@/lib/admin/auth-context';
 import { useStaffNotifications, markRead } from '@/lib/notifications/store';
@@ -61,6 +61,7 @@ const nav = [
     { href: '/admin/nos-clients', label: 'Nos clients', icon: Building2 },
     { href: '/admin/blog', label: 'Blog', icon: Newspaper },
     { href: '/admin/pages', label: 'Pages', icon: FileEdit },
+    { href: '/admin/faq', label: 'FAQ', icon: HelpCircle },
     { href: '/admin/newsletter', label: 'Newsletter', icon: Mail },
   ]},
   { section: 'Production', items: [

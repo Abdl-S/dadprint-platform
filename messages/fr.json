@@ -239,7 +239,9 @@
     "thanksTitle": "Merci pour votre retour !",
     "thanksDesc": "Votre avis nous aide à nous améliorer et sera publié après vérification.",
     "photosLabel": "Ajouter des photos (optionnel)",
-    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez."
+    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez.",
+    "orderContextTitle": "Votre avis concerne cette commande",
+    "orderNotFound": "Référence de commande introuvable — votre avis restera quand même pris en compte, simplement sans être rattaché à une commande précise."
   },
   "common": {
     "loading": "Chargement...",

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { applyOrderStatusChange } from '@/lib/automation/workflow';
 import { logActivity } from '@/lib/logs/store';
+import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminOrderRow, OrderStatus } from '@/lib/data/admin';
 
 export function AdminCommandesClient({ initial, orderStatuses }: { initial: AdminOrderRow[]; orderStatuses: OrderStatus[] }) {
@@ -29,6 +31,12 @@ export function AdminCommandesClient({ initial, orderStatuses }: { initial: Admi
     logActivity(`${ref} → ${label}`, 'Commandes');
   }
 
+  function sendReviewLink(order: AdminOrderRow) {
+    const link = `${window.location.origin}/avis/evaluation?commande=${encodeURIComponent(order.reference)}`;
+    const message = `Bonjour ${order.clientName},\n\nVotre commande DadPrint (réf. ${order.reference}) est arrivée à son terme — merci de votre confiance !\n\nSi vous avez une minute, votre avis nous aide beaucoup :\n${link}\n\nL'équipe DadPrint`;
+    window.open(buildWhatsAppUrlToClient(order.clientPhone, message), '_blank');
+  }
+
   const filtered = filter ? orders.filter((o) => o.status === filter) : orders;
 
   return (
@@ -44,7 +52,7 @@ export function AdminCommandesClient({ initial, orderStatuses }: { initial: Admi
         ))}
       </div>
 
-      <AdminTable headers={['Référence', 'Client', 'Produit', 'Qté', 'Montant', 'Statut', 'Date']}>
+      <AdminTable headers={['Référence', 'Client', 'Produit', 'Qté', 'Montant', 'Statut', 'Date', '']}>
         {filtered.map((o) => (
           <tr key={o.reference}>
             <td className="px-4 py-3 font-mono text-xs">{o.reference}</td>
@@ -61,6 +69,11 @@ export function AdminCommandesClient({ initial, orderStatuses }: { initial: Admi
               </select>
             </td>
             <td className="px-4 py-3 text-xs text-ink-40">{new Date(o.date).toLocaleDateString('fr-FR')}</td>
+            <td className="px-4 py-3">
+              <button title="Envoyer le lien d'avis sur WhatsApp" onClick={() => sendReviewLink(o)} className="text-brand-magenta hover:text-brand-magenta/70">
+                <Star size={15} />
+              </button>
+            </td>
           </tr>
         ))}
       </AdminTable>

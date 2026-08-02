@@ -1,7 +1,16 @@
 import { createClient } from '@/lib/supabase/public';
-import type { Pack, PortfolioItem, ClientCompany, Testimonial } from '@/types';
+import type { Pack, PortfolioItem, ClientCompany, Testimonial, LocalizedText } from '@/types';
 
 /** Même principe que catalog.ts : lit Supabase, retourne la forme attendue par les composants existants. */
+
+export interface FaqItemRow { id: string; question: LocalizedText; answer: LocalizedText }
+
+export async function getFaq(): Promise<FaqItemRow[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('dp_faq').select('*').order('sort_order');
+  if (error || !data) return [];
+  return data.map((f) => ({ id: f.id, question: f.question, answer: f.answer }));
+}
 
 export async function getPacks(): Promise<Pack[]> {
   const supabase = createClient();

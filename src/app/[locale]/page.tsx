@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import type { Locale } from '@/types';
 import { getCategories } from '@/lib/data/catalog';
-import { getPortfolioItems, getTestimonials, getClientCompanies } from '@/lib/data/content';
+import { getPortfolioItems, getTestimonials, getClientCompanies, getFaq } from '@/lib/data/content';
 import { Hero } from '@/components/home/Hero';
 import { AboutIntro } from '@/components/home/AboutIntro';
 import { Advantages } from '@/components/home/Advantages';
@@ -19,18 +19,18 @@ import { ContactSection } from '@/components/home/ContactSection';
  * Page d'accueil — composition de toutes les sections demandées.
  * Chaque section est un composant indépendant dans components/home/ :
  * en retirer, réordonner ou en ajouter une nouvelle ne touche jamais aux autres.
- * Les données réelles (catégories, réalisations, avis, entreprises clientes)
- * sont récupérées ici une seule fois et transmises en props — la FAQ reste
- * sur contenu éditorial fixe, aucune table dédiée en base pour l'instant.
+ * Les données réelles (catégories, réalisations, avis, entreprises clientes,
+ * FAQ) sont récupérées ici une seule fois et transmises en props.
  */
 export default async function HomePage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
 
-  const [categories, portfolioItems, testimonials, clientCompanies] = await Promise.all([
+  const [categories, portfolioItems, testimonials, clientCompanies, faq] = await Promise.all([
     getCategories(),
     getPortfolioItems(),
     getTestimonials(),
     getClientCompanies(),
+    getFaq(),
   ]);
 
   const localBusinessJsonLd = {
@@ -57,7 +57,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
       <WhyUs />
       <TrustedCompanies clientCompanies={clientCompanies} />
       <TestimonialsSection testimonials={testimonials} />
-      <FaqSection />
+      <FaqSection faq={faq} />
       <ContactSection />
     </>
   );

@@ -239,7 +239,9 @@
     "thanksTitle": "Thank you for your feedback!",
     "thanksDesc": "Your review helps us improve and will be published after verification.",
     "photosLabel": "Add photos (optional)",
-    "submitError": "Something went wrong. Check your connection and try again."
+    "submitError": "Something went wrong. Check your connection and try again.",
+    "orderContextTitle": "Your review is about this order",
+    "orderNotFound": "Order reference not found — your review will still be recorded, just not linked to a specific order."
   },
   "common": {
     "loading": "Loading...",

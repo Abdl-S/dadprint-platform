@@ -8,22 +8,19 @@ import { Section } from '@/components/ui/Section';
 import type { FaqItemRow } from '@/lib/data/content';
 import type { Locale } from '@/types';
 
-export function FaqSection({ faq }: { faq: FaqItemRow[] }) {
+/** FAQ dédiée — mêmes données réelles que la section d'accueil, présentées en profondeur. */
+export function FaqPageClient({ faq }: { faq: FaqItemRow[] }) {
   const t = useTranslations('faq');
   const locale = useLocale() as Locale;
   const [open, setOpen] = useState<number | null>(0);
 
-  if (faq.length === 0) return null;
-
   return (
-    <Section>
+    <Section className="pt-12">
       <Container className="max-w-3xl">
-        <div className="mb-10 text-center">
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-brand-magenta">{t('eyebrow')}</span>
-          <h2 className="mt-3 text-3xl font-black sm:text-4xl">{t('title')}</h2>
-        </div>
+        <h1 className="text-4xl font-black">{t('title')}</h1>
+        <p className="mt-3 text-ink-70">{t('pageSubtitle')}</p>
 
-        <div className="divide-y divide-ink-8">
+        <div className="mt-10 divide-y divide-ink-8">
           {faq.map((item, i) => (
             <div key={item.id} className="py-5">
               <button
