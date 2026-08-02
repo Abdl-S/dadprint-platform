@@ -6,7 +6,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import {
   LayoutDashboard, FolderTree, Package, Boxes, PenTool, FileText, ShoppingCart,
   Users, Star, Image as ImageIcon, Building2, Newspaper, Mail, FileEdit, Settings,
-  CreditCard, ShieldCheck, BarChart3, Sparkles, Menu, X, LogOut, Bell,
+  CreditCard, ShieldCheck, BarChart3, Sparkles, Menu, X, LogOut, Bell, Receipt,
 } from 'lucide-react';
 import { useAdminAuth, type AdminRole } from '@/lib/admin/auth-context';
 import { useStaffNotifications, markRead } from '@/lib/notifications/store';
@@ -23,6 +23,7 @@ const ROLE_ACCESS: Record<string, AdminRole[]> = {
   '/admin/devis': ['administrateur', 'commercial'],
   '/admin/commandes': ['administrateur', 'commercial', 'production', 'livreur'],
   '/admin/paiements': ['administrateur', 'commercial'],
+  '/admin/factures': ['administrateur', 'commercial'],
   '/admin/clients': ['administrateur', 'commercial', 'support'],
   '/admin/avis': ['administrateur', 'support'],
   '/admin/packs': ['administrateur', 'commercial'],
@@ -49,6 +50,7 @@ const nav = [
     { href: '/admin/devis', label: 'Devis', icon: FileText },
     { href: '/admin/commandes', label: 'Commandes', icon: ShoppingCart },
     { href: '/admin/paiements', label: 'Paiements', icon: CreditCard },
+    { href: '/admin/factures', label: 'Factures', icon: Receipt },
   ]},
   { section: 'Clients', items: [
     { href: '/admin/clients', label: 'CRM Clients', icon: Users },

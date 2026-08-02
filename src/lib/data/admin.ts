@@ -32,6 +32,35 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
   }));
 }
 
+export interface AdminInvoiceRow {
+  id: string;
+  reference: string;
+  orderReference: string | null;
+  clientName: string;
+  amount: number;
+  status: 'en_attente' | 'payee';
+  issuedAt: string;
+}
+
+export async function getAdminInvoices(): Promise<AdminInvoiceRow[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('dp_invoices')
+    .select('id, reference, amount, status, issued_at, dp_orders(reference, client_name)')
+    .order('issued_at', { ascending: false });
+  if (error || !data) return [];
+
+  return data.map((i: any) => ({
+    id: i.id,
+    reference: i.reference,
+    orderReference: i.dp_orders?.reference ?? null,
+    clientName: i.dp_orders?.client_name ?? '—',
+    amount: i.amount,
+    status: i.status,
+    issuedAt: i.issued_at,
+  }));
+}
+
 export interface AdminOrderRow {
   reference: string;
   clientName: string;

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Send, ArrowRightCircle, Download, Printer, Plus } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
+import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminQuoteRow } from '@/lib/data/admin';
 import type { Product } from '@/types';
 
@@ -93,7 +94,16 @@ export function AdminDevisClient({ initial, products }: { initial: AdminQuoteRow
             <td className="px-4 py-3 text-xs text-ink-40">{new Date(q.date).toLocaleDateString('fr-FR')}</td>
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-2.5">
-                <button title="Envoyer" className="text-ink-40 hover:text-ink"><Send size={14} /></button>
+                <button
+                  title="Envoyer sur WhatsApp"
+                  onClick={() => {
+                    const message = `Bonjour ${q.clientName},\n\nVoici votre devis DadPrint (réf. ${q.reference}) pour : ${q.productName}.\n\nNous revenons vers vous rapidement avec le détail et le prix. N'hésitez pas si vous avez des questions.\n\nL'équipe DadPrint`;
+                    window.open(buildWhatsAppUrlToClient(q.clientPhone, message), '_blank');
+                  }}
+                  className="text-success hover:text-success/70"
+                >
+                  <Send size={14} />
+                </button>
                 <button title="Télécharger" className="text-ink-40 hover:text-ink"><Download size={14} /></button>
                 <button title="Imprimer" className="text-ink-40 hover:text-ink"><Printer size={14} /></button>
                 <button title="Convertir en commande" onClick={() => convertToOrder(q.reference)} className="text-brand-magenta"><ArrowRightCircle size={16} /></button>

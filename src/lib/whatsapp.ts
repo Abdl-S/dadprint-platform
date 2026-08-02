@@ -58,6 +58,17 @@ export function buildWhatsAppUrl(ctx: WaOrderDetails): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildWhatsAppMessage(ctx))}`;
 }
 
+/**
+ * Envoie un message VERS le numéro d'un client (utilisé par l'admin pour
+ * répondre/confirmer), à ne jamais confondre avec `buildWhatsAppUrl` qui
+ * envoie toujours vers le numéro de DadPrint lui-même.
+ */
+export function buildWhatsAppUrlToClient(phone: string, message: string): string {
+  const digitsOnly = phone.replace(/[^\d]/g, '');
+  const withCountryCode = digitsOnly.startsWith('222') ? digitsOnly : `222${digitsOnly}`;
+  return `https://wa.me/${withCountryCode}?text=${encodeURIComponent(message)}`;
+}
+
 export function buildTelUrl(): string {
   return `tel:${CALL_NUMBER}`;
 }

@@ -17,4 +17,9 @@ describe('generateReferenceNumber', () => {
     const b = generateReferenceNumber('commande');
     expect(a).not.toBe(b);
   });
+
+  it('produit une référence facture au bon format', () => {
+    const ref = generateReferenceNumber('facture');
+    expect(ref).toMatch(/^DP-FAC-\d{8}-\d{4}$/);
+  });
 });
