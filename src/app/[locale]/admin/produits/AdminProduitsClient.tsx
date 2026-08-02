@@ -17,7 +17,10 @@ const emptyProduct = (defaultCategorySlug: string): Product => ({
   images: [], specs: [], faq: [], pricingMode: 'quote', orderForm: [], available: true,
 });
 
-export function AdminProduitsClient({ initialProducts, categories }: { initialProducts: Product[]; categories: Category[] }) {
+export function AdminProduitsClient({ initialProducts, categories: initialCategories }: { initialProducts: Product[]; categories: Category[] }) {
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [creatingCategory, setCreatingCategory] = useState(false);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -52,6 +55,28 @@ export function AdminProduitsClient({ initialProducts, categories }: { initialPr
 
   function openEdit(p: Product) { setEditing({ ...p }); setTab('infos'); setModalOpen(true); }
   function openNew() { setEditing(emptyProduct(categories[0]?.slug ?? '')); setTab('infos'); setModalOpen(true); }
+
+  async function createCategoryQuick() {
+    if (!newCategoryName.trim()) return;
+    setCreatingCategory(true);
+    const slug = newCategoryName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    try {
+      const res = await fetch('/api/admin/categories', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, name: { fr: newCategoryName, en: newCategoryName, ar: newCategoryName } }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la création');
+      const { id } = await res.json();
+      const newCat: Category = { id, slug, name: { fr: newCategoryName, en: newCategoryName, ar: newCategoryName }, description: { fr: '', en: '', ar: '' }, coverImageUrl: '', productCount: 0 };
+      setCategories((prev) => [...prev, newCat]);
+      if (editing) setEditing({ ...editing, categorySlug: slug });
+      setNewCategoryName('');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Une erreur est survenue.');
+    } finally {
+      setCreatingCategory(false);
+    }
+  }
 
   async function save() {
     if (!editing) return;
@@ -166,6 +191,23 @@ export function AdminProduitsClient({ initialProducts, categories }: { initialPr
             {tab === 'infos' && (
               <div className="space-y-3">
                 <input placeholder="Nom du produit" aria-label="Nom du produit" value={editing.name.fr} onChange={(e) => setEditing({ ...editing, name: { ...editing.name, fr: e.target.value } })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+                <select aria-label="Catégorie" value={editing.categorySlug} onChange={(e) => setEditing({ ...editing, categorySlug: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm">
+                  {categories.map((c) => <option key={c.slug} value={c.slug}>{c.parentSlug ? '↳ ' : ''}{c.name.fr}</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <input
+                    placeholder="Nouvelle catégorie (ex : Porte-clés)" aria-label="Nom de la nouvelle catégorie"
+                    value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); createCategoryQuick(); } }}
+                    className="flex-1 rounded-md border border-ink-15 p-2.5 text-xs"
+                  />
+                  <button
+                    type="button" onClick={createCategoryQuick} disabled={creatingCategory || !newCategoryName.trim()}
+                    className="shrink-0 rounded-md bg-ink px-3 text-xs font-bold text-paper disabled:opacity-40"
+                  >
+                    {creatingCategory ? '...' : '+ Créer'}
+                  </button>
+                </div>
                 <button
                   type="button" onClick={generateWithAI} disabled={generating}
                   className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-brand-magenta to-brand-cyan px-4 py-2.5 text-xs font-bold text-white disabled:opacity-60"
@@ -175,9 +217,6 @@ export function AdminProduitsClient({ initialProducts, categories }: { initialPr
                 </button>
                 <textarea placeholder="Description courte" aria-label="Description courte" rows={2} value={editing.shortDescription.fr} onChange={(e) => setEditing({ ...editing, shortDescription: { ...editing.shortDescription, fr: e.target.value } })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
                 <textarea placeholder="Description détaillée" aria-label="Description détaillée" rows={4} value={editing.description.fr} onChange={(e) => setEditing({ ...editing, description: { ...editing.description, fr: e.target.value } })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
-                <select aria-label="Catégorie" value={editing.categorySlug} onChange={(e) => setEditing({ ...editing, categorySlug: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm">
-                  {categories.map((c) => <option key={c.slug} value={c.slug}>{c.parentSlug ? '↳ ' : ''}{c.name.fr}</option>)}
-                </select>
                 <div>
                   <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-ink-40">Images du produit</p>
                   <AdminImageUpload images={editing.images} onChange={(images) => setEditing({ ...editing, images })} />
