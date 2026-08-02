@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Send, ArrowRightCircle, Download, Printer, Plus } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
+import { DocumentPdfModal } from '@/components/admin/DocumentPdfModal';
 import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminQuoteRow } from '@/lib/data/admin';
 import type { Product } from '@/types';
@@ -21,6 +22,7 @@ const statusLabels: Record<AdminQuote['status'], string> = {
 export function AdminDevisClient({ initial, products }: { initial: AdminQuoteRow[]; products: Product[] }) {
   const [quotes, setQuotes] = useState<AdminQuote[]>(initial as AdminQuote[]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [pdfTarget, setPdfTarget] = useState<AdminQuote | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', phone: '', email: '', city: '', productSlug: '', comments: '' });
@@ -104,7 +106,7 @@ export function AdminDevisClient({ initial, products }: { initial: AdminQuoteRow
                 >
                   <Send size={14} />
                 </button>
-                <button title="Télécharger" className="text-ink-40 hover:text-ink"><Download size={14} /></button>
+                <button title="Télécharger le PDF" onClick={() => setPdfTarget(q)} className="text-ink-40 hover:text-ink"><Download size={14} /></button>
                 <button title="Imprimer" className="text-ink-40 hover:text-ink"><Printer size={14} /></button>
                 <button title="Convertir en commande" onClick={() => convertToOrder(q.reference)} className="text-brand-magenta"><ArrowRightCircle size={16} /></button>
               </div>
@@ -132,6 +134,25 @@ export function AdminDevisClient({ initial, products }: { initial: AdminQuoteRow
           <button onClick={createQuote} disabled={saving} className="w-full rounded-lg bg-ink py-3 text-sm font-bold text-paper disabled:opacity-60">{saving ? 'Création...' : 'Créer le devis'}</button>
         </div>
       </AdminModal>
+
+      {pdfTarget && (
+        <DocumentPdfModal
+          open={!!pdfTarget}
+          onClose={() => setPdfTarget(null)}
+          title={`PDF — Devis ${pdfTarget.reference}`}
+          onGenerate={async (lines) => {
+            const res = await fetch(`/api/admin/quotes/${pdfTarget.reference}/pdf`, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lines }),
+            });
+            if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la génération');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `${pdfTarget.reference}.pdf`; a.click();
+            URL.revokeObjectURL(url);
+          }}
+        />
+      )}
     </div>
   );
 }

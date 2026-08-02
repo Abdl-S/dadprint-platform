@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Send, CheckCircle2 } from 'lucide-react';
+import { Plus, Send, CheckCircle2, Download } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
+import { DocumentPdfModal } from '@/components/admin/DocumentPdfModal';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminInvoiceRow } from '@/lib/data/admin';
@@ -12,6 +13,7 @@ import type { AdminOrderRow } from '@/lib/data/admin';
 export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoiceRow[]; orders: AdminOrderRow[] }) {
   const [invoices, setInvoices] = useState<AdminInvoiceRow[]>(initial);
   const [modalOpen, setModalOpen] = useState(false);
+  const [pdfTarget, setPdfTarget] = useState<AdminInvoiceRow | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [form, setForm] = useState({ orderReference: '', amount: '' });
@@ -80,6 +82,7 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-2.5">
                 <button title="Envoyer sur WhatsApp" onClick={() => sendInvoice(inv)} className="text-success hover:text-success/70"><Send size={14} /></button>
+                <button title="Télécharger le PDF" onClick={() => setPdfTarget(inv)} className="text-ink-40 hover:text-ink"><Download size={14} /></button>
                 {inv.status !== 'payee' && (
                   <button title="Marquer payée" onClick={() => markPaid(inv.id, 'payee')} className="text-ink-40 hover:text-ink"><CheckCircle2 size={16} /></button>
                 )}
@@ -100,6 +103,25 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
           <button onClick={createInvoice} disabled={saving} className="w-full rounded-lg bg-ink py-3 text-sm font-bold text-paper disabled:opacity-60">{saving ? 'Création...' : 'Créer la facture'}</button>
         </div>
       </AdminModal>
+
+      {pdfTarget && (
+        <DocumentPdfModal
+          open={!!pdfTarget}
+          onClose={() => setPdfTarget(null)}
+          title={`PDF — Facture ${pdfTarget.reference}`}
+          onGenerate={async (lines) => {
+            const res = await fetch(`/api/admin/invoices/${pdfTarget.id}/pdf`, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lines }),
+            });
+            if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la génération');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `${pdfTarget.reference}.pdf`; a.click();
+            URL.revokeObjectURL(url);
+          }}
+        />
+      )}
     </div>
   );
 }
