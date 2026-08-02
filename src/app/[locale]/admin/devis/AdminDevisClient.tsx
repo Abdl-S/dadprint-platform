@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, ArrowRightCircle, Download, Printer } from 'lucide-react';
+import { Send, ArrowRightCircle, Download, Printer, Plus } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
-import { StatusBadge } from '@/components/admin/StatusBadge';
+import { AdminModal } from '@/components/admin/AdminModal';
 import type { AdminQuoteRow } from '@/lib/data/admin';
+import type { Product } from '@/types';
+
 type AdminQuote = AdminQuoteRow & { status: 'nouveau' | 'en_cours' | 'envoye' | 'accepte' | 'refuse' };
 
 const statusColors: Record<AdminQuote['status'], string> = {
@@ -15,8 +17,12 @@ const statusLabels: Record<AdminQuote['status'], string> = {
   nouveau: 'Nouveau', en_cours: 'En cours', envoye: 'Envoyé', accepte: 'Accepté', refuse: 'Refusé',
 };
 
-export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
+export function AdminDevisClient({ initial, products }: { initial: AdminQuoteRow[]; products: Product[] }) {
   const [quotes, setQuotes] = useState<AdminQuote[]>(initial as AdminQuote[]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: '', phone: '', email: '', city: '', productSlug: '', comments: '' });
 
   async function setStatus(ref: string, status: AdminQuote['status']) {
     const previous = quotes;
@@ -35,9 +41,40 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
     setStatus(ref, 'accepte');
   }
 
+  async function createQuote() {
+    if (!form.name || !form.phone) { setSaveError('Nom et téléphone requis.'); return; }
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const res = await fetch('/api/admin/quotes', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la création');
+      const { reference } = await res.json();
+      const product = products.find((p) => p.slug === form.productSlug);
+      setQuotes((prev) => [{
+        reference, clientName: form.name, clientPhone: form.phone,
+        productName: product?.name.fr ?? '—', city: form.city || null,
+        status: 'nouveau', date: new Date().toISOString(),
+      }, ...prev]);
+      setModalOpen(false);
+      setForm({ name: '', phone: '', email: '', city: '', productSlug: '', comments: '' });
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Une erreur est survenue.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
-      <p className="text-sm text-ink-70">{quotes.length} devis — répondre, convertir, suivre l'historique complet.</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-ink-70">{quotes.length} devis — répondre, convertir, suivre l'historique complet.</p>
+        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 rounded-lg bg-brand-magenta px-4 py-2.5 text-sm font-bold text-white shadow-glow">
+          <Plus size={16} /> Nouveau devis
+        </button>
+      </div>
 
       <AdminTable headers={['Référence', 'Client', 'Produit', 'Statut', 'Date', '']}>
         {quotes.map((q) => (
@@ -65,6 +102,26 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
           </tr>
         ))}
       </AdminTable>
+
+      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title="Nouveau devis">
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input placeholder="Nom du client" aria-label="Nom du client" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+            <input placeholder="Téléphone" aria-label="Téléphone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input placeholder="Email (optionnel)" aria-label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+            <input placeholder="Ville" aria-label="Ville" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+          </div>
+          <select aria-label="Produit" value={form.productSlug} onChange={(e) => setForm({ ...form, productSlug: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm">
+            <option value="">— Produit (optionnel) —</option>
+            {products.map((p) => <option key={p.id} value={p.slug}>{p.name.fr}</option>)}
+          </select>
+          <textarea placeholder="Notes / détails de la demande" aria-label="Notes" value={form.comments} onChange={(e) => setForm({ ...form, comments: e.target.value })} rows={3} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+          {saveError && <p role="alert" className="rounded-md border border-danger/30 bg-danger/5 p-3 text-sm text-danger">{saveError}</p>}
+          <button onClick={createQuote} disabled={saving} className="w-full rounded-lg bg-ink py-3 text-sm font-bold text-paper disabled:opacity-60">{saving ? 'Création...' : 'Créer le devis'}</button>
+        </div>
+      </AdminModal>
     </div>
   );
 }
