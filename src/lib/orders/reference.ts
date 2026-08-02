@@ -1,6 +1,10 @@
 /**
- * Génère un numéro de référence unique pour un devis, une commande ou une facture.
- * Format : DP-DEV-AAAAMMJJ-XXXX / DP-CMD-AAAAMMJJ-XXXX / DP-FAC-AAAAMMJJ-XXXX.
+ * Génère un numéro de référence pour une commande (format non séquentiel :
+ * date + nombre aléatoire). Les devis et factures utilisent désormais un
+ * vrai compteur séquentiel (voir `lib/orders/sequentialReference.ts`) —
+ * cette fonction reste utilisée uniquement pour les commandes, non demandé
+ * pour ce type de document.
+ * Format : DP-CMD-AAAAMMJJ-XXXX.
  */
 export function generateReferenceNumber(type: 'devis' | 'commande' | 'facture'): string {
   const prefix = type === 'devis' ? 'DEV' : type === 'commande' ? 'CMD' : 'FAC';

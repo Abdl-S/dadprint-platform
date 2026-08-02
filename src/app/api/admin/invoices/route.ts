@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateReferenceNumber } from '@/lib/orders/reference';
+import { generateSequentialReference } from '@/lib/orders/sequentialReference';
 
 /** POST /api/admin/invoices — crée une facture, liée ou non à une commande (staff uniquement, via RLS). */
 export async function POST(request: Request) {
@@ -14,7 +14,13 @@ export async function POST(request: Request) {
     orderId = order?.id ?? null;
   }
 
-  const reference = generateReferenceNumber('facture');
+  let reference: string;
+  try {
+    reference = await generateSequentialReference(supabase, 'facture');
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Erreur de référence' }, { status: 500 });
+  }
+
   const { error } = await supabase.from('dp_invoices').insert({
     order_id: orderId, reference, amount, status: 'en_attente',
   });

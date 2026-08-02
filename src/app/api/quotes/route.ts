@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateReferenceNumber } from '@/lib/orders/reference';
+import { generateSequentialReference } from '@/lib/orders/sequentialReference';
 
 /** POST /api/quotes — crée un devis + sa ligne. Ouvert au public (formulaire visiteur). */
 export async function POST(request: Request) {
@@ -11,8 +11,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Nom et téléphone requis' }, { status: 400 });
   }
 
-  const reference = generateReferenceNumber('devis');
   const supabase = createClient();
+  let reference: string;
+  try {
+    reference = await generateSequentialReference(supabase, 'devis');
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Erreur de référence' }, { status: 500 });
+  }
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data: quote, error } = await supabase.from('dp_quotes').insert({

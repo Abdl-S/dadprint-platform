@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateDocumentPdf } from '@/lib/pdf/generateDocument';
 
+/** Reformate "DP-FAC-2026-0001" en "0001/2026" pour l'affichage, comme dans le modèle fourni par le client. */
+function formatRefForDisplay(reference: string, prefix: string): string {
+  const [year, counter] = reference.replace(prefix, '').split('-');
+  return counter ? `${counter}/${year}` : reference;
+}
+
 /** POST /api/admin/invoices/[id]/pdf — génère le PDF de la facture dans le même modèle que le devis (staff uniquement, via RLS). */
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const { lines } = await request.json();
@@ -16,7 +22,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
   const pdfBytes = await generateDocumentPdf({
     kind: 'facture',
-    reference: invoice.reference.replace('DP-FAC-', ''),
+    reference: formatRefForDisplay(invoice.reference, 'DP-FAC-'),
     date: new Date(invoice.issued_at),
     clientName: (invoice as any).dp_orders?.client_name ?? '—',
     lines,
