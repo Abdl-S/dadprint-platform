@@ -2,10 +2,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
-import { portfolioItems } from '@/lib/mock/data';
-import type { Locale } from '@/types';
+import type { Locale, PortfolioItem } from '@/types';
 
-export function BestRealisations() {
+export function BestRealisations({ portfolioItems }: { portfolioItems: PortfolioItem[] }) {
   const t = useTranslations('realisations');
   const locale = useLocale() as Locale;
 

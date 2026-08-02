@@ -2,17 +2,18 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Container } from '@/components/ui/Container';
 import { Link } from '@/i18n/navigation';
-import { clientCompanies } from '@/lib/mock/data';
+import type { ClientCompany } from '@/types';
 
 /**
  * Défilement continu en CSS pur (aucune librairie) — boucle infinie fluide
  * obtenue en dupliquant la liste une fois et en animant sur 100% de son
  * propre déplacement. Se met en pause au survol pour rester lisible.
- * ⚠️ Logos d'exemple — à remplacer par les vraies entreprises clientes ayant donné leur accord.
  */
-export function TrustedCompanies() {
+export function TrustedCompanies({ clientCompanies }: { clientCompanies: ClientCompany[] }) {
   const t = useTranslations('trustedCompanies');
   const track = [...clientCompanies, ...clientCompanies];
+
+  if (clientCompanies.length === 0) return null;
 
   return (
     <div className="overflow-hidden border-y border-ink-8 py-14">

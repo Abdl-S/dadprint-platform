@@ -2,10 +2,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
-import { categories } from '@/lib/mock/data';
-import type { Locale } from '@/types';
+import type { Category, Locale } from '@/types';
 
-export function CategoriesGrid() {
+export function CategoriesGrid({ categories }: { categories: Category[] }) {
   const t = useTranslations('categories');
   const locale = useLocale() as Locale;
   const rootCategories = categories.filter((c) => !c.parentSlug);

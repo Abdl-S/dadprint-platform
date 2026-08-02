@@ -4,10 +4,9 @@ import { Section } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
 import { ReviewCard } from '@/components/ui/ReviewCard';
 import { Link } from '@/i18n/navigation';
-import { testimonials } from '@/lib/mock/data';
-import type { Locale } from '@/types';
+import type { Locale, Testimonial } from '@/types';
 
-export function TestimonialsSection() {
+export function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   const t = useTranslations('testimonials');
   const locale = useLocale() as Locale;
 
