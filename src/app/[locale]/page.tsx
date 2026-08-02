@@ -1,6 +1,6 @@
 import { setRequestLocale } from 'next-intl/server';
 import type { Locale } from '@/types';
-import { getCategories } from '@/lib/data/catalog';
+import { getProducts } from '@/lib/data/catalog';
 import { getPortfolioItems, getTestimonials, getClientCompanies, getFaq } from '@/lib/data/content';
 import { Hero } from '@/components/home/Hero';
 import { AboutIntro } from '@/components/home/AboutIntro';
@@ -8,7 +8,7 @@ import { Advantages } from '@/components/home/Advantages';
 import { ServicesOverview } from '@/components/home/ServicesOverview';
 import { WhyUs } from '@/components/home/WhyUs';
 import { HowItWorks } from '@/components/home/HowItWorks';
-import { CategoriesGrid } from '@/components/home/CategoriesGrid';
+import { ProductsPreview } from '@/components/home/ProductsPreview';
 import { BestRealisations } from '@/components/home/BestRealisations';
 import { TrustedCompanies } from '@/components/home/TrustedCompanies';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
@@ -19,14 +19,17 @@ import { ContactSection } from '@/components/home/ContactSection';
  * Page d'accueil — composition de toutes les sections demandées.
  * Chaque section est un composant indépendant dans components/home/ :
  * en retirer, réordonner ou en ajouter une nouvelle ne touche jamais aux autres.
- * Les données réelles (catégories, réalisations, avis, entreprises clientes,
- * FAQ) sont récupérées ici une seule fois et transmises en props.
+ * Les données réelles (produits, réalisations, avis, entreprises clientes,
+ * FAQ) sont récupérées ici une seule fois et transmises en props. La grille
+ * de catégories a été remplacée par une grille de produits directement
+ * cliquables — le client voit immédiatement de vrais produits plutôt que de
+ * devoir d'abord choisir une catégorie.
  */
 export default async function HomePage({ params: { locale } }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
 
-  const [categories, portfolioItems, testimonials, clientCompanies, faq] = await Promise.all([
-    getCategories(),
+  const [products, portfolioItems, testimonials, clientCompanies, faq] = await Promise.all([
+    getProducts(),
     getPortfolioItems(),
     getTestimonials(),
     getClientCompanies(),
@@ -51,7 +54,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
       <AboutIntro />
       <Advantages />
       <ServicesOverview />
-      <CategoriesGrid categories={categories} />
+      <ProductsPreview products={products} />
       <BestRealisations portfolioItems={portfolioItems} />
       <HowItWorks />
       <WhyUs />

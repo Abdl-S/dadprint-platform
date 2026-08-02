@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
@@ -14,13 +15,30 @@ import type { Locale, Category, Product } from '@/types';
 /**
  * Catalogue — filtrable par catégorie ET sous-catégorie, profondeur illimitée
  * en théorie (portée par `parentSlug`). Tout vient de `categories`/`products`
- * (Supabase plus tard), jamais d'une liste figée dans le composant.
+ * (Supabase). Lit `?categorie=slug` dans l'URL au chargement — c'est ce lien
+ * qu'utilisent la page d'accueil et le header pour ouvrir directement une
+ * catégorie précise, sans repasser par "Toutes".
  */
 export function ProduitsPageClient({ categories, products }: { categories: Category[]; products: Product[] }) {
   const t = useTranslations('catalog');
   const locale = useLocale() as Locale;
+  const searchParams = useSearchParams();
   const [activeRoot, setActiveRoot] = useState<string | null>(null);
   const [activeSub, setActiveSub] = useState<string | null>(null);
+
+  useEffect(() => {
+    const slug = searchParams.get('categorie');
+    if (!slug) return;
+    const match = categories.find((c) => c.slug === slug);
+    if (!match) return;
+    if (match.parentSlug) {
+      setActiveRoot(match.parentSlug);
+      setActiveSub(match.slug);
+    } else {
+      setActiveRoot(match.slug);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const rootCategories = useMemo(() => categories.filter((c) => !c.parentSlug), [categories]);
   const subCategories = useMemo(

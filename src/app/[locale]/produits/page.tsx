@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { getCategories, getProducts } from '@/lib/data/catalog';
 import { ProduitsPageClient } from './ProduitsPageClient';
 
@@ -7,5 +8,9 @@ import { ProduitsPageClient } from './ProduitsPageClient';
  */
 export default async function ProduitsPage() {
   const [categories, products] = await Promise.all([getCategories(), getProducts()]);
-  return <ProduitsPageClient categories={categories} products={products} />;
+  return (
+    <Suspense fallback={null}>
+      <ProduitsPageClient categories={categories} products={products} />
+    </Suspense>
+  );
 }
