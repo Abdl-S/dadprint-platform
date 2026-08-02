@@ -76,26 +76,40 @@ notification) mais **non envoyés réellement** — aucune clé d'API n'est disp
 environnement. Le jour où ces intégrations seront branchées, elles consommeront le même événement
 `applyOrderStatusChange`, sans toucher à l'admin.
 
-## 4. Ce qui est réellement fonctionnel vs. démonstratif
+## 4. Ce qui est réellement fonctionnel vs. démonstratif (mis à jour — V1.0)
 
-**Réel, sans backend :**
-- Génération/export de fichiers (newsletter CSV, sauvegarde JSON)
-- Validation de fichiers (type + taille) avant envoi
+**Réel, avec backend Supabase branché :**
+- Authentification client ET admin (Supabase Auth, comptes réels, un déclencheur en base crée
+  automatiquement un profil "client" à l'inscription — promouvoir en staff se fait uniquement en
+  base, jamais depuis l'interface)
+- Catalogue, packs, portfolio, entreprises clientes, avis (lecture ET écriture réelles)
+- Devis et commandes — écriture réelle en base, y compris **sans compte client** (le cas d'usage
+  principal), avec référence générée côté serveur et repli WhatsApp en confirmation
+- Suivi de commande/devis par référence (`/suivi`), public, sans compte requis
+- Espace client (`/compte`) — onglet Devis & commandes branché sur les vraies données ; les autres
+  onglets (paiements, fichiers, marques, favoris, adresses, notifications) restent sur données
+  d'exemple, même principe de branchement à appliquer
+- Administration — Produits, Catégories, Commandes, Devis, Packs, Portfolio, Avis, Blog,
+  Utilisateurs & rôles : CRUD réel, RLS "staff uniquement" appliquée au niveau base
+- Envoi direct d'images (Supabase Storage, bucket `dp-products`), remplace la saisie d'URL manuelle
+- Newsletter — inscription réellement enregistrée
+- Génération/export de fichiers (CSV, sauvegarde JSON), validation de fichiers avant envoi
 - Recommandations produits (règles métier, pas de ML)
 - Notifications et journal d'activité (en mémoire, temps réel dans la session)
 - Données structurées SEO (Schema.org Product / LocalBusiness) + sitemap dynamique complet
-- Permissions par rôle appliquées dans la sidebar admin
-- Optimisation d'images via `next/image` sur le Hero et la fiche produit (LCP prioritaire) —
-  le reste du site utilise encore `<img>` classique ; une passe complète est un chantier mécanique
-  à part, sans risque, mais volontairement pas fait sur 100% du site à cette étape
 - PWA installable, service worker, mise en cache
+- Optimisation d'images via `next/image` sur les points à fort trafic (catalogue, packs, blog,
+  produits liés, avis, logos partenaires) — les galeries en cascade (masonry) restent en `<img>`
+  natif par choix technique assumé (voir `AUDIT.md`)
 
-**Démonstratif — nécessite un vrai backend :**
-- Authentification admin (actuellement : tout email/mot de passe fonctionne)
-- Persistance des données (tout est réinitialisé au rechargement de page)
-- Envoi réel des notifications (email/WhatsApp/SMS/push)
+**Encore démonstratif ou non branché :**
+- `/blog` et `/blog/[slug]` côté public (l'admin blog, lui, est branché)
 - Génération IA (gabarits actuellement, pas de LLM connecté)
-- Paiements (aucune transaction réelle)
+- Paiements (aucune transaction réelle — les moyens de paiement mauritaniens sont affichés,
+  pas encore intégrés)
+- Envoi réel de notifications par email/SMS/push (WhatsApp fonctionne, via lien `wa.me`)
+- Anti-spam avancé (un honeypot protège des robots simples, pas d'un spam ciblé — pas de
+  reCAPTCHA/hCaptcha)
 
 ## 5. Installation
 
@@ -234,14 +248,69 @@ un changement localisé à ce seul fichier.
 
 ## 6. Déploiement
 
-Projet Next.js standard — compatible Netlify (Next.js Runtime) ou Vercel. Le service worker et le
-manifest PWA sont déjà configurés ; aucune étape supplémentaire n'est nécessaire pour l'installation
-sur mobile/desktop une fois déployé sur un vrai domaine HTTPS.
+DadPrint est un projet Next.js 14 standard (App Router). Il est **déjà déployé réellement** :
+code sur GitHub (`Abdl-S/dadprint-platform`), site en production sur Netlify
+(`dadprint-platform.netlify.app`), connecté au vrai projet Supabase.
+
+### Variables d'environnement requises (toutes plateformes)
+```
+NEXT_PUBLIC_SUPABASE_URL=https://qoivvabtdsyzoofxgfjh.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<clé publique du projet Supabase>
+```
+
+### Netlify (déploiement actuel)
+- Build command : `npm run build`
+- Publish directory : `.next`
+- Le Next.js Runtime de Netlify gère automatiquement le rendu serveur (API routes, pages
+  dynamiques) — aucune configuration `netlify.toml` supplémentaire n'est nécessaire
+- Déploiement continu : chaque `git push` sur `main` redéploie automatiquement
+
+### Vercel
+- Import direct du dépôt GitHub, aucune configuration supplémentaire (Vercel détecte Next.js
+  nativement, c'est l'éditeur du framework)
+- Ajouter les deux variables d'environnement dans Project Settings → Environment Variables
+
+### Docker
+```dockerfile
+FROM node:20-alpine AS base
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+Build et lancement :
+```bash
+docker build -t dadprint .
+docker run -p 3000:3000 --env-file .env.local dadprint
+```
+
+### VPS Linux / serveur Node.js
+```bash
+git clone https://github.com/Abdl-S/dadprint-platform.git
+cd dadprint-platform
+npm ci
+npm run build
+npm start   # ou via pm2 : pm2 start npm --name dadprint -- start
+```
+Un reverse proxy (Nginx/Caddy) devant le port 3000 gère le HTTPS et le domaine.
 
 ## 7. Maintenance & évolutions futures
 
-- **Base de données** : recréer le schéma Supabase en suivant exactement les types de `src/types/index.ts`
-- **Auth** : remplacer `lib/admin/auth-context.tsx` par Supabase Auth + RLS par rôle
+**Déjà fait (contrairement aux versions précédentes de ce document) :**
+- Base de données réelle (schéma Supabase complet, préfixe `dp_`, RLS sur toutes les tables)
+- Authentification réelle, client et admin (Supabase Auth)
+
+**Reste à faire :**
+- Brancher `/blog` et `/blog/[slug]` côté public sur les vraies données (l'admin est déjà branché)
+- Compléter l'espace client (`/compte`) : paiements, fichiers, marques, favoris, adresses,
+  notifications — même principe que l'onglet Devis & commandes déjà branché
 - **IA** : remplacer le corps de `app/api/ai/generate-product/route.ts` par un appel LLM réel
-- **Notifications** : brancher un fournisseur email (Resend/SendGrid), WhatsApp Business API, et un service push (déjà préparé côté service worker)
-- **Paiements** : intégrer les API réelles de Bankily/Masrivi/Sedad/Click/BIM Bank/Amanty quand disponibles
+- **Notifications** : brancher un fournisseur email (Resend/SendGrid), WhatsApp Business API, et
+  un service push (déjà préparé côté service worker)
+- **Paiements** : intégrer les API réelles de Bankily/Masrivi/Sedad/Click/BIM Bank/Amanty
+- **Anti-spam renforcé** : reCAPTCHA/hCaptcha sur les formulaires publics, au-delà du honeypot actuel
+- Conversion complète des galeries en cascade (masonry) vers `next/image` (nécessite de récupérer
+  les dimensions réelles de chaque image au préalable — voir `AUDIT.md`)
