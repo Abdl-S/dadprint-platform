@@ -5,7 +5,7 @@ import { generateReferenceNumber } from '@/lib/orders/reference';
 /** POST /api/orders — crée une commande + sa ligne. Déclenche aussi une notification interne (via trigger applicatif côté admin). */
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, phone, productId, quantity, unitPrice, options, deliveryMode, addressId, designChoice, paymentPreference } = body;
+  const { name, phone, productId, quantity, unitPrice, options, deliveryMode, addressId, designChoice, designBrief, paymentPreference } = body;
 
   if (!name || !phone || !productId) {
     return NextResponse.json({ error: 'Nom, téléphone et produit requis' }, { status: 400 });
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     reference, client_name: name, client_phone: phone, status: 'nouveau',
     client_id: user?.id ?? null,
     delivery_mode: deliveryMode ?? 'delivery', address_id: addressId ?? null,
-    design_choice: designChoice ?? null, total_amount: (unitPrice ?? 0) * (quantity ?? 1),
+    design_choice: designChoice ?? null, design_brief: designBrief ?? null, total_amount: (unitPrice ?? 0) * (quantity ?? 1),
     payment_preference: paymentPreference ?? null,
   }).select().single();
 

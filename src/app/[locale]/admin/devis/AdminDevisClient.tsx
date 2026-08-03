@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ArrowRightCircle, Download, Plus, Trash2 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
@@ -16,6 +17,7 @@ const statusLabels: Record<AdminQuote['status'], string> = {
 };
 
 export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
+  const searchParams = useSearchParams();
   const [quotes, setQuotes] = useState<AdminQuote[]>(initial as AdminQuote[]);
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -23,6 +25,18 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', comments: '' });
   const [lines, setLines] = useState<Line[]>([{ qty: 1, description: '', unitPrice: 0 }]);
   const [pdfLoadingRef, setPdfLoadingRef] = useState<string | null>(null);
+
+  // Arrivée depuis "Créer un devis" sur une commande (Admin → Commandes) : pré-remplit et ouvre directement.
+  useEffect(() => {
+    const prefillName = searchParams.get('prefillName');
+    const prefillPhone = searchParams.get('prefillPhone');
+    const prefillDescription = searchParams.get('prefillDescription');
+    if (!prefillName && !prefillPhone) return;
+    setForm((prev) => ({ ...prev, name: prefillName ?? prev.name, phone: prefillPhone ?? prev.phone }));
+    if (prefillDescription) setLines([{ qty: 1, description: prefillDescription, unitPrice: 0 }]);
+    setModalOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [preview, setPreview] = useState<{ quote: AdminQuote; url: string; fileName: string } | null>(null);
 
   async function setStatus(ref: string, status: AdminQuote['status']) {

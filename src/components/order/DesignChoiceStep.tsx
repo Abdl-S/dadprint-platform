@@ -17,10 +17,20 @@ import type { DesignChoice } from '@/types';
  * Un seul composant, réutilisé partout, pour ne jamais dupliquer cette logique.
  */
 export function DesignChoiceStep({
-  value, onChange,
-}: { value: DesignChoice; onChange: (v: DesignChoice) => void }) {
+  value, onChange, onFilesChange, onBriefChange,
+}: {
+  value: DesignChoice;
+  onChange: (v: DesignChoice) => void;
+  onFilesChange?: (files: File[]) => void;
+  onBriefChange?: (text: string) => void;
+}) {
   const t = useTranslations('designStep');
   const [brief, setBrief] = useState('');
+
+  function handleBriefChange(text: string) {
+    setBrief(text);
+    onBriefChange?.(text);
+  }
 
   const options: { key: DesignChoice; label: string; icon: typeof FileCheck2 }[] = [
     { key: 'has_design', label: t('hasDesign'), icon: FileCheck2 },
@@ -60,7 +70,7 @@ export function DesignChoiceStep({
         {value === 'has_design' && (
           <div>
             <p className="mb-2 text-sm text-ink-70">{t('uploadPrompt')}</p>
-            <FileUpload />
+            <FileUpload onChange={onFilesChange} />
           </div>
         )}
 
@@ -69,7 +79,7 @@ export function DesignChoiceStep({
             <p className="text-sm text-ink-70">{t('briefPrompt')}</p>
             <textarea
               value={brief}
-              onChange={(e) => setBrief(e.target.value)}
+              onChange={(e) => handleBriefChange(e.target.value)}
               rows={4}
               placeholder={t('briefPlaceholder')}
               className="w-full rounded-lg border border-ink-15 p-3.5 text-sm transition-colors focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
@@ -80,10 +90,11 @@ export function DesignChoiceStep({
         {value === 'needs_edit' && (
           <div className="space-y-3">
             <p className="text-sm text-ink-70">{t('editUploadPrompt')}</p>
-            <FileUpload />
+            <FileUpload onChange={onFilesChange} />
             <textarea
               rows={3}
               placeholder={t('editDescriptionPlaceholder')}
+              onChange={(e) => handleBriefChange(e.target.value)}
               className="w-full rounded-lg border border-ink-15 p-3.5 text-sm transition-colors focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
             />
           </div>

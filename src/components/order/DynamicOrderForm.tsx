@@ -9,6 +9,7 @@ import { PaymentMethodPicker } from '@/components/payment/PaymentMethodPicker';
 import { LiveProductPreview } from '@/components/configurator/LiveProductPreview';
 import { Button } from '@/components/ui/Button';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { createClient } from '@/lib/supabase/client';
 
 /**
  * Rendu d'UN champ selon sa définition — c'est ce moteur générique qui permet
@@ -195,6 +196,8 @@ export function DynamicOrderForm({ product }: { product: Product }) {
   const [instructions, setInstructions] = useState('');
   const [paymentProvider, setPaymentProvider] = useState<PaymentProvider | null>(null);
   const [paymentPreference, setPaymentPreference] = useState<'now_full' | 'now_deposit' | 'after_validation' | ''>('');
+  const [designFiles, setDesignFiles] = useState<File[]>([]);
+  const [designBrief, setDesignBrief] = useState('');
   const [reference, setReference] = useState<string | null>(null);
   const [website, setWebsite] = useState(''); // honeypot anti-spam — un humain ne remplit jamais ce champ invisible
   const [submitting, setSubmitting] = useState(false);
@@ -228,6 +231,7 @@ export function DynamicOrderForm({ product }: { product: Product }) {
           options: { ...options, commentaires: commentsField ? values[commentsField.key] : undefined },
           deliveryMode: delivery,
           designChoice,
+          designBrief: designBrief || undefined,
           paymentPreference: paymentPreference || undefined,
         }),
       });
@@ -237,8 +241,24 @@ export function DynamicOrderForm({ product }: { product: Product }) {
         throw new Error(body.error || t('submitError'));
       }
 
-      const { reference: ref } = await res.json();
+      const { reference: ref, id: orderId } = await res.json();
       setReference(ref);
+
+      // Envoie réellement les fichiers du client vers le stockage, rattachés à cette commande —
+      // avant, ces fichiers restaient seulement dans le navigateur et disparaissaient à l'envoi.
+      if (designFiles.length > 0) {
+        const supabase = createClient();
+        for (const file of designFiles) {
+          const path = `${orderId}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('dp-client-files').upload(path, file);
+          if (!uploadError) {
+            await fetch('/api/orders/files', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId, name: file.name, storagePath: path, mimeType: file.type, sizeBytes: file.size }),
+            });
+          }
+        }
+      }
 
       // La commande est enregistrée ; WhatsApp reste un canal de confirmation immédiate en plus, pas le seul enregistrement.
       window.open(
@@ -317,7 +337,7 @@ export function DynamicOrderForm({ product }: { product: Product }) {
         />
       ))}
 
-      <DesignChoiceStep value={designChoice} onChange={setDesignChoice} />
+      <DesignChoiceStep value={designChoice} onChange={setDesignChoice} onFilesChange={setDesignFiles} onBriefChange={setDesignBrief} />
 
       <fieldset>
         <legend className="mb-2 text-sm font-bold">{t('deliveryQuestion')}</legend>

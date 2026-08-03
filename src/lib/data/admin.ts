@@ -64,6 +64,7 @@ export async function getAdminInvoices(): Promise<AdminInvoiceRow[]> {
 }
 
 export interface AdminOrderRow {
+  id: string;
   reference: string;
   clientName: string;
   clientPhone: string;
@@ -72,17 +73,20 @@ export interface AdminOrderRow {
   amount: number;
   status: string;
   date: string;
+  paymentPreference: 'now_full' | 'now_deposit' | 'after_validation' | null;
+  fileCount: number;
 }
 
 export async function getAdminOrders(): Promise<AdminOrderRow[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('dp_orders')
-    .select('reference, client_name, client_phone, status, created_at, total_amount, dp_order_lines(quantity, dp_products(name))')
+    .select('id, reference, client_name, client_phone, status, created_at, total_amount, payment_preference, dp_order_lines(quantity, dp_products(name)), dp_files(id)')
     .order('created_at', { ascending: false });
   if (error || !data) return [];
 
   return data.map((o: any) => ({
+    id: o.id,
     reference: o.reference,
     clientName: o.client_name ?? '—',
     clientPhone: o.client_phone ?? '—',
@@ -91,6 +95,8 @@ export async function getAdminOrders(): Promise<AdminOrderRow[]> {
     amount: o.total_amount ?? 0,
     status: o.status,
     date: o.created_at,
+    paymentPreference: o.payment_preference ?? null,
+    fileCount: o.dp_files?.length ?? 0,
   }));
 }
 
