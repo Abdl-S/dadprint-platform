@@ -5,7 +5,7 @@ import { generateSequentialReference } from '@/lib/orders/sequentialReference';
 /** POST /api/quotes — crée un devis + sa ligne. Ouvert au public (formulaire visiteur). */
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, phone, email, city, country, address, deliveryAddress, productId, quantity, options, comments, desiredDate } = body;
+  const { name, phone, email, city, country, address, deliveryAddress, productId, quantity, options, comments, desiredDate, designChoice, designBrief } = body;
 
   if (!name || !phone) {
     return NextResponse.json({ error: 'Nom et téléphone requis' }, { status: 400 });
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     reference, client_name: name, client_phone: phone, client_email: email,
     client_id: user?.id ?? null,
     city, country, address, delivery_address: deliveryAddress, desired_date: desiredDate || null,
-    comments, status: 'nouveau',
+    comments, status: 'nouveau', design_choice: designChoice ?? null, design_brief: designBrief ?? null,
   }).select().single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
