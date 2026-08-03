@@ -148,7 +148,8 @@
     "relatedProducts": "منتجات مشابهة",
     "tipsTitle": "نصائح",
     "complementaryTitle": "أكمل مشروعك",
-    "complementarySubtitle": "غالباً ما يُطلب مع هذا المنتج."
+    "complementarySubtitle": "غالباً ما يُطلب مع هذا المنتج.",
+    "scrollToOrder": "اطلب الآن"
   },
   "orderForm": {
     "title": "خصص طلبك",

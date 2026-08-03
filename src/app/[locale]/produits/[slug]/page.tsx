@@ -9,6 +9,7 @@ import { RatingStars } from '@/components/ui/RatingStars';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { DynamicOrderForm } from '@/components/order/DynamicOrderForm';
+import { ScrollToOrderButton } from '@/components/product/ScrollToOrderButton';
 import { Link } from '@/i18n/navigation';
 import { getProducts, getProductBySlug } from '@/lib/data/catalog';
 import { getTestimonials, getPortfolioItems } from '@/lib/data/content';
@@ -124,10 +125,11 @@ export default async function ProductDetailPage({
         </div>
 
         {/* Formulaire de commande dynamique — propre à ce produit */}
-        <div className="mx-auto mt-16 max-w-2xl rounded-lg border border-ink-8 p-6 sm:p-8">
+        <div id="order-form" className="mx-auto mt-16 max-w-2xl rounded-lg border border-ink-8 p-6 sm:p-8">
           <DynamicOrderForm product={product} />
         </div>
 
+        <ScrollToOrderButton targetId="order-form" />
         {product.faq.length > 0 && (
           <div className="mx-auto mt-16 max-w-2xl">
             <h2 className="mb-5 text-xl font-bold">{t('faqTitle')}</h2>

@@ -148,7 +148,8 @@
     "relatedProducts": "Produits similaires",
     "tipsTitle": "Conseils",
     "complementaryTitle": "Complète ton projet",
-    "complementarySubtitle": "Souvent commandés ensemble avec ce produit."
+    "complementarySubtitle": "Souvent commandés ensemble avec ce produit.",
+    "scrollToOrder": "Commander"
   },
   "orderForm": {
     "title": "Configurez votre commande",
