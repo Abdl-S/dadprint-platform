@@ -1,19 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
- * Génère une référence séquentielle réelle (DP-DEV-2026-0001, DP-FAC-2026-0001...),
- * remplace l'ancien tirage aléatoire pour les devis et les factures. Le
- * compteur vit en base (`dp_next_reference`), incrémenté de façon atomique —
- * jamais de doublon possible même en cas de créations simultanées.
- *
- * Les commandes gardent volontairement l'ancien format (référence + date +
- * nombre aléatoire) — non demandé pour ce type de document.
+ * Génère une référence séquentielle réelle (DP-DEV-2026-0001, DP-FAC-2026-0001,
+ * DP-CMD-2026-0001...). Le compteur vit en base (`dp_next_reference`),
+ * incrémenté de façon atomique — jamais de doublon possible même en cas de
+ * créations simultanées. Utilisé pour les devis, factures et commandes.
  */
 export async function generateSequentialReference(
   supabase: SupabaseClient,
-  type: 'devis' | 'facture'
+  type: 'devis' | 'facture' | 'commande'
 ): Promise<string> {
-  const prefix = type === 'devis' ? 'DEV' : 'FAC';
+  const prefix = type === 'devis' ? 'DEV' : type === 'facture' ? 'FAC' : 'CMD';
   const year = new Date().getFullYear();
 
   const { data, error } = await supabase.rpc('dp_next_reference', { p_type: type, p_year: year });

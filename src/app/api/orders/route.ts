@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateReferenceNumber } from '@/lib/orders/reference';
+import { generateSequentialReference } from '@/lib/orders/sequentialReference';
 
 /** POST /api/orders — crée une commande + sa ligne. Déclenche aussi une notification interne (via trigger applicatif côté admin). */
 export async function POST(request: Request) {
@@ -11,8 +11,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Nom, téléphone et produit requis' }, { status: 400 });
   }
 
-  const reference = generateReferenceNumber('commande');
   const supabase = createClient();
+  let reference: string;
+  try {
+    reference = await generateSequentialReference(supabase, 'commande');
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Erreur de référence' }, { status: 500 });
+  }
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data: order, error } = await supabase.from('dp_orders').insert({
