@@ -70,7 +70,7 @@ function ComptePageContent({ orders, profile }: { orders: MyOrder[]; profile: { 
     setChangingPassword(false);
 
     if (error) {
-      setPasswordMessage({ type: 'error', text: "Échec du changement de mot de passe. Réessayez." });
+      setPasswordMessage({ type: 'error', text: error.message || "Échec du changement de mot de passe. Réessayez." });
       return;
     }
     setPasswordMessage({ type: 'success', text: 'Mot de passe mis à jour avec succès.' });
