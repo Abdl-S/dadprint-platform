@@ -162,7 +162,7 @@ export async function getAdminQuotes(): Promise<AdminQuoteRow[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('dp_quotes')
-    .select('reference, client_name, client_phone, city, status, created_at, dp_quote_lines(dp_products(name))')
+    .select('reference, client_name, client_phone, city, status, created_at, dp_quote_lines(description, dp_products(name))')
     .order('created_at', { ascending: false });
   if (error || !data) return [];
 
@@ -170,7 +170,7 @@ export async function getAdminQuotes(): Promise<AdminQuoteRow[]> {
     reference: q.reference,
     clientName: q.client_name ?? '—',
     clientPhone: q.client_phone ?? '—',
-    productName: q.dp_quote_lines?.[0]?.dp_products?.name?.fr ?? '—',
+    productName: q.dp_quote_lines?.[0]?.dp_products?.name?.fr ?? q.dp_quote_lines?.[0]?.description?.fr ?? '—',
     city: q.city,
     status: q.status,
     date: q.created_at,
