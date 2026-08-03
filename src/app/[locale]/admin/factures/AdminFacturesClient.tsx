@@ -72,9 +72,9 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
         body: JSON.stringify({ orderReference: orderReference || null, ...form, lines: validLines }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la création');
-      const { reference, amount } = await res.json();
+      const { id, reference, amount } = await res.json();
       setInvoices((prev) => [{
-        id: reference, reference, orderReference: orderReference || null,
+        id, reference, orderReference: orderReference || null,
         clientName: form.name, clientPhone: form.phone, amount,
         status: 'en_attente', issuedAt: new Date().toISOString(),
       }, ...prev]);

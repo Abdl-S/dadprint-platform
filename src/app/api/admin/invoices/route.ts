@@ -46,5 +46,5 @@ export async function POST(request: Request) {
     }))
   );
 
-  return NextResponse.json({ reference, amount: totalAmount }, { status: 201 });
+  return NextResponse.json({ id: invoice.id, reference, amount: totalAmount }, { status: 201 });
 }
