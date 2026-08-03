@@ -1,22 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Send, CheckCircle2, Download } from 'lucide-react';
+import { Plus, Send, CheckCircle2, Download, Trash2 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
-import { DocumentPdfModal } from '@/components/admin/DocumentPdfModal';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
-import type { AdminInvoiceRow } from '@/lib/data/admin';
-import type { AdminOrderRow } from '@/lib/data/admin';
+import type { AdminInvoiceRow, AdminOrderRow } from '@/lib/data/admin';
+
+interface Line { qty: number; description: string; unitPrice: number }
 
 export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoiceRow[]; orders: AdminOrderRow[] }) {
   const [invoices, setInvoices] = useState<AdminInvoiceRow[]>(initial);
   const [modalOpen, setModalOpen] = useState(false);
-  const [pdfTarget, setPdfTarget] = useState<AdminInvoiceRow | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [form, setForm] = useState({ orderReference: '', amount: '' });
+  const [orderReference, setOrderReference] = useState('');
+  const [lines, setLines] = useState<Line[]>([{ qty: 1, description: '', unitPrice: 0 }]);
+  const [pdfLoadingId, setPdfLoadingId] = useState<string | null>(null);
+
+  function updateLine(i: number, patch: Partial<Line>) {
+    setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
+  }
 
   async function markPaid(id: string, status: 'en_attente' | 'payee') {
     const previous = invoices;
@@ -27,33 +32,55 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
     if (!res.ok) { setInvoices(previous); alert('La mise à jour a échoué.'); }
   }
 
-  function sendInvoice(invoice: AdminInvoiceRow) {
-    const order = orders.find((o) => o.reference === invoice.orderReference);
-    const phone = order?.clientPhone;
-    if (!phone) { alert("Aucun numéro de téléphone associé à cette facture."); return; }
-    const message = `Bonjour ${invoice.clientName},\n\nVoici votre facture DadPrint (réf. ${invoice.reference})${invoice.orderReference ? ` pour la commande ${invoice.orderReference}` : ''}.\n\nMontant : ${invoice.amount.toLocaleString('fr-FR')} MRU\n\nMerci de votre confiance.\nL'équipe DadPrint`;
-    window.open(buildWhatsAppUrlToClient(phone, message), '_blank');
+  async function downloadPdf(inv: AdminInvoiceRow, alsoSendWhatsApp: boolean) {
+    setPdfLoadingId(inv.id);
+    try {
+      const res = await fetch(`/api/admin/invoices/${inv.id}/pdf`, { method: 'POST' });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Échec de la génération du PDF');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${inv.reference}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+
+      if (alsoSendWhatsApp) {
+        const order = orders.find((o) => o.reference === inv.orderReference);
+        const phone = order?.clientPhone;
+        if (!phone) { alert("Aucun numéro de téléphone associé à cette facture."); return; }
+        const message = `Bonjour ${inv.clientName},\n\nVoici votre facture DadPrint (réf. ${inv.reference}), en pièce jointe.\n\nMerci de votre confiance.\nL'équipe DadPrint`;
+        window.open(buildWhatsAppUrlToClient(phone, message), '_blank');
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Une erreur est survenue.');
+    } finally {
+      setPdfLoadingId(null);
+    }
   }
 
   async function createInvoice() {
-    if (!form.amount) { setSaveError('Le montant est requis.'); return; }
+    const validLines = lines.filter((l) => l.description.trim() && l.unitPrice > 0);
+    if (validLines.length === 0) { setSaveError('Ajoutez au moins une ligne avec une description et un prix.'); return; }
     setSaving(true);
     setSaveError(null);
     try {
       const res = await fetch('/api/admin/invoices', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderReference: form.orderReference || null, amount: Number(form.amount) }),
+        body: JSON.stringify({ orderReference: orderReference || null, lines: validLines }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la création');
-      const { reference } = await res.json();
-      const order = orders.find((o) => o.reference === form.orderReference);
+      const { reference, amount } = await res.json();
+      const order = orders.find((o) => o.reference === orderReference);
       setInvoices((prev) => [{
-        id: reference, reference, orderReference: form.orderReference || null,
-        clientName: order?.clientName ?? '—', amount: Number(form.amount),
+        id: reference, reference, orderReference: orderReference || null,
+        clientName: order?.clientName ?? '—', amount,
         status: 'en_attente', issuedAt: new Date().toISOString(),
       }, ...prev]);
       setModalOpen(false);
-      setForm({ orderReference: '', amount: '' });
+      setOrderReference('');
+      setLines([{ qty: 1, description: '', unitPrice: 0 }]);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Une erreur est survenue.');
     } finally {
@@ -81,8 +108,10 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
             <td className="px-4 py-3 text-xs text-ink-40">{new Date(inv.issuedAt).toLocaleDateString('fr-FR')}</td>
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-2.5">
-                <button title="Envoyer sur WhatsApp" onClick={() => sendInvoice(inv)} className="text-success hover:text-success/70"><Send size={14} /></button>
-                <button title="Télécharger le PDF" onClick={() => setPdfTarget(inv)} className="text-ink-40 hover:text-ink"><Download size={14} /></button>
+                <button title="Générer le PDF et ouvrir WhatsApp" disabled={pdfLoadingId === inv.id} onClick={() => downloadPdf(inv, true)} className="text-success hover:text-success/70 disabled:opacity-40">
+                  {pdfLoadingId === inv.id ? '…' : <Send size={14} />}
+                </button>
+                <button title="Télécharger le PDF" onClick={() => downloadPdf(inv, false)} className="text-ink-40 hover:text-ink"><Download size={14} /></button>
                 {inv.status !== 'payee' && (
                   <button title="Marquer payée" onClick={() => markPaid(inv.id, 'payee')} className="text-ink-40 hover:text-ink"><CheckCircle2 size={16} /></button>
                 )}
@@ -92,36 +121,42 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
         ))}
       </AdminTable>
 
-      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title="Nouvelle facture">
-        <div className="space-y-3">
-          <select aria-label="Commande liée" value={form.orderReference} onChange={(e) => setForm({ ...form, orderReference: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm">
+      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title="Nouvelle facture" wide>
+        <div className="space-y-4">
+          <select aria-label="Commande liée" value={orderReference} onChange={(e) => setOrderReference(e.target.value)} className="w-full rounded-md border border-ink-15 p-3 text-sm">
             <option value="">— Commande (optionnel) —</option>
             {orders.map((o) => <option key={o.reference} value={o.reference}>{o.reference} — {o.clientName}</option>)}
           </select>
-          <input type="number" placeholder="Montant (MRU)" aria-label="Montant" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-40">Détail de la facture</p>
+            <div className="space-y-2">
+              {lines.map((line, i) => (
+                <div key={i} className="grid grid-cols-[60px_1fr_110px_110px_32px] items-center gap-2">
+                  <input type="number" min={1} value={line.qty} aria-label="Quantité" onChange={(e) => updateLine(i, { qty: Number(e.target.value) })} className="rounded-md border border-ink-15 p-2 text-sm" />
+                  <input placeholder="Description" aria-label="Description" value={line.description} onChange={(e) => updateLine(i, { description: e.target.value })} className="rounded-md border border-ink-15 p-2 text-sm" />
+                  <input type="number" placeholder="P.U (MRU)" aria-label="Prix unitaire" value={line.unitPrice || ''} onChange={(e) => updateLine(i, { unitPrice: Number(e.target.value) })} className="rounded-md border border-ink-15 p-2 text-sm" />
+                  <p className="text-sm text-ink-40">{(line.qty * line.unitPrice).toLocaleString('fr-FR')} MRU</p>
+                  <button type="button" onClick={() => setLines((prev) => prev.filter((_, idx) => idx !== i))} disabled={lines.length === 1} className="text-danger disabled:opacity-30" aria-label="Retirer cette ligne">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={() => setLines((prev) => [...prev, { qty: 1, description: '', unitPrice: 0 }])} className="mt-2 flex items-center gap-1.5 text-xs font-bold text-brand-magenta">
+              <Plus size={14} /> Ajouter une ligne
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between rounded-md bg-ink-8 p-3">
+            <span className="text-sm font-bold">Total</span>
+            <span className="text-sm font-bold">{lines.reduce((s, l) => s + l.qty * l.unitPrice, 0).toLocaleString('fr-FR')} MRU</span>
+          </div>
+
           {saveError && <p role="alert" className="rounded-md border border-danger/30 bg-danger/5 p-3 text-sm text-danger">{saveError}</p>}
           <button onClick={createInvoice} disabled={saving} className="w-full rounded-lg bg-ink py-3 text-sm font-bold text-paper disabled:opacity-60">{saving ? 'Création...' : 'Créer la facture'}</button>
         </div>
       </AdminModal>
-
-      {pdfTarget && (
-        <DocumentPdfModal
-          open={!!pdfTarget}
-          onClose={() => setPdfTarget(null)}
-          title={`PDF — Facture ${pdfTarget.reference}`}
-          onGenerate={async (lines) => {
-            const res = await fetch(`/api/admin/invoices/${pdfTarget.id}/pdf`, {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lines }),
-            });
-            if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la génération');
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `${pdfTarget.reference}.pdf`; a.click();
-            URL.revokeObjectURL(url);
-          }}
-        />
-      )}
     </div>
   );
 }

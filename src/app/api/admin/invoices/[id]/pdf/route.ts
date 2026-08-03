@@ -8,17 +8,21 @@ function formatRefForDisplay(reference: string, prefix: string): string {
   return counter ? `${counter}/${year}` : reference;
 }
 
-/** POST /api/admin/invoices/[id]/pdf — génère le PDF de la facture dans le même modèle que le devis (staff uniquement, via RLS). */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-  const { lines } = await request.json();
-  if (!Array.isArray(lines) || lines.length === 0) {
-    return NextResponse.json({ error: 'Au moins une ligne est requise' }, { status: 400 });
-  }
-
+/** POST /api/admin/invoices/[id]/pdf — génère le PDF à partir des lignes déjà enregistrées avec la facture (staff uniquement, via RLS). */
+export async function POST(_request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient();
   const { data: invoice, error } = await supabase
     .from('dp_invoices').select('reference, issued_at, dp_orders(client_name, address_id)').eq('id', params.id).single();
   if (error || !invoice) return NextResponse.json({ error: 'Facture introuvable' }, { status: 404 });
+
+  const { data: savedLines } = await supabase
+    .from('dp_invoice_lines').select('description, quantity, unit_price').eq('invoice_id', params.id).order('sort_order');
+
+  const lines = (savedLines ?? []).map((l) => ({ description: l.description.fr as string, qty: l.quantity as number, unitPrice: l.unit_price as number }));
+
+  if (lines.length === 0) {
+    return NextResponse.json({ error: 'Cette facture ne contient aucune ligne détaillée.' }, { status: 400 });
+  }
 
   const pdfBytes = await generateDocumentPdf({
     kind: 'facture',
