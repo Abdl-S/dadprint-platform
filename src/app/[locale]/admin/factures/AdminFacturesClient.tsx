@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Plus, CheckCircle2, Download, Trash2 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
-import { StatusBadge } from '@/components/admin/StatusBadge';
 import { PdfPreviewModal } from '@/components/admin/PdfPreviewModal';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminInvoiceRow, AdminOrderRow } from '@/lib/data/admin';
 
@@ -17,12 +17,20 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [orderReference, setOrderReference] = useState('');
+  const [form, setForm] = useState({ name: '', phone: '', email: '', address: '' });
   const [lines, setLines] = useState<Line[]>([{ qty: 1, description: '', unitPrice: 0 }]);
   const [pdfLoadingId, setPdfLoadingId] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ invoice: AdminInvoiceRow; url: string; fileName: string } | null>(null);
 
   function updateLine(i: number, patch: Partial<Line>) {
     setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
+  }
+
+  // Pré-remplit les champs client à partir de la commande choisie, sans empêcher de les corriger.
+  function selectOrder(ref: string) {
+    setOrderReference(ref);
+    const order = orders.find((o) => o.reference === ref);
+    if (order) setForm((prev) => ({ ...prev, name: order.clientName, phone: order.clientPhone }));
   }
 
   async function markPaid(id: string, status: 'en_attente' | 'payee') {
@@ -53,6 +61,7 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
   }
 
   async function createInvoice() {
+    if (!form.name || !form.phone) { setSaveError('Nom et téléphone requis.'); return; }
     const validLines = lines.filter((l) => l.description.trim() && l.unitPrice > 0);
     if (validLines.length === 0) { setSaveError('Ajoutez au moins une ligne avec une description et un prix.'); return; }
     setSaving(true);
@@ -60,18 +69,18 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
     try {
       const res = await fetch('/api/admin/invoices', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderReference: orderReference || null, lines: validLines }),
+        body: JSON.stringify({ orderReference: orderReference || null, ...form, lines: validLines }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Échec de la création');
       const { reference, amount } = await res.json();
-      const order = orders.find((o) => o.reference === orderReference);
       setInvoices((prev) => [{
         id: reference, reference, orderReference: orderReference || null,
-        clientName: order?.clientName ?? '—', amount,
+        clientName: form.name, clientPhone: form.phone, amount,
         status: 'en_attente', issuedAt: new Date().toISOString(),
       }, ...prev]);
       setModalOpen(false);
       setOrderReference('');
+      setForm({ name: '', phone: '', email: '', address: '' });
       setLines([{ qty: 1, description: '', unitPrice: 0 }]);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Une erreur est survenue.');
@@ -94,7 +103,10 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
           <tr key={inv.id}>
             <td className="px-4 py-3 font-mono text-xs">{inv.reference}</td>
             <td className="px-4 py-3 font-mono text-xs text-ink-40">{inv.orderReference ?? '—'}</td>
-            <td className="px-4 py-3">{inv.clientName}</td>
+            <td className="px-4 py-3">
+              <p className="font-semibold">{inv.clientName}</p>
+              {inv.clientPhone && <p className="text-xs text-ink-40">{inv.clientPhone}</p>}
+            </td>
             <td className="px-4 py-3 font-semibold">{inv.amount.toLocaleString('fr-FR')} MRU</td>
             <td className="px-4 py-3"><StatusBadge label={inv.status === 'payee' ? 'Payée' : 'En attente'} className={inv.status === 'payee' ? 'bg-success/10 text-success' : 'bg-ink-8 text-ink'} /></td>
             <td className="px-4 py-3 text-xs text-ink-40">{new Date(inv.issuedAt).toLocaleDateString('fr-FR')}</td>
@@ -114,10 +126,19 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
 
       <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title="Nouvelle facture" wide>
         <div className="space-y-4">
-          <select aria-label="Commande liée" value={orderReference} onChange={(e) => setOrderReference(e.target.value)} className="w-full rounded-md border border-ink-15 p-3 text-sm">
+          <select aria-label="Commande liée" value={orderReference} onChange={(e) => selectOrder(e.target.value)} className="w-full rounded-md border border-ink-15 p-3 text-sm">
             <option value="">— Commande (optionnel) —</option>
             {orders.map((o) => <option key={o.reference} value={o.reference}>{o.reference} — {o.clientName}</option>)}
           </select>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input placeholder="Nom du client" aria-label="Nom du client" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+            <input placeholder="Téléphone" aria-label="Téléphone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input placeholder="Email (optionnel)" aria-label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+            <input placeholder="Adresse" aria-label="Adresse" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+          </div>
 
           <div>
             <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-40">Détail de la facture</p>
@@ -159,13 +180,9 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
             a.href = preview.url; a.download = preview.fileName; a.click();
           }}
           onSendWhatsApp={() => {
-            const order = orders.find((o) => o.reference === preview.invoice.orderReference);
-            const phone = order?.clientPhone;
-            if (!phone) { alert("Aucun numéro de téléphone associé à cette facture."); return; }
-            // WhatsApp ne permet pas de joindre un fichier depuis un lien — le PDF a déjà été
-            // téléchargé ci-dessus, il ne reste qu'à le glisser dans la conversation qui s'ouvre ici.
+            if (!preview.invoice.clientPhone) { alert("Aucun numéro de téléphone associé à cette facture."); return; }
             const message = `Bonjour ${preview.invoice.clientName},\n\nVoici votre facture DadPrint (réf. ${preview.invoice.reference}), en pièce jointe.\n\nMerci de votre confiance.\nL'équipe DadPrint`;
-            window.open(buildWhatsAppUrlToClient(phone, message), '_blank');
+            window.open(buildWhatsAppUrlToClient(preview.invoice.clientPhone, message), '_blank');
           }}
         />
       )}

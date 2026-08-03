@@ -9,7 +9,7 @@ import { generateSequentialReference } from '@/lib/orders/sequentialReference';
  * à être réutilisé pour générer le PDF sans ressaisie.
  */
 export async function POST(request: Request) {
-  const { name, phone, email, city, comments, status, lines } = await request.json();
+  const { name, phone, email, address, comments, status, lines } = await request.json();
   if (!name || !phone) return NextResponse.json({ error: 'Nom et téléphone requis' }, { status: 400 });
 
   const supabase = createClient();
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   const { data: quote, error } = await supabase.from('dp_quotes').insert({
     reference, client_name: name, client_phone: phone, client_email: email || null,
-    city: city || null, comments: comments || null, status: status || 'nouveau',
+    address: address || null, comments: comments || null, status: status || 'nouveau',
   }).select().single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

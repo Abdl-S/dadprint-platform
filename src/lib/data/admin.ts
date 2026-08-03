@@ -37,6 +37,7 @@ export interface AdminInvoiceRow {
   reference: string;
   orderReference: string | null;
   clientName: string;
+  clientPhone: string | null;
   amount: number;
   status: 'en_attente' | 'payee';
   issuedAt: string;
@@ -46,7 +47,7 @@ export async function getAdminInvoices(): Promise<AdminInvoiceRow[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('dp_invoices')
-    .select('id, reference, amount, status, issued_at, dp_orders(reference, client_name)')
+    .select('id, reference, amount, status, issued_at, client_name, client_phone, dp_orders(reference, client_name, client_phone)')
     .order('issued_at', { ascending: false });
   if (error || !data) return [];
 
@@ -54,7 +55,8 @@ export async function getAdminInvoices(): Promise<AdminInvoiceRow[]> {
     id: i.id,
     reference: i.reference,
     orderReference: i.dp_orders?.reference ?? null,
-    clientName: i.dp_orders?.client_name ?? '—',
+    clientName: i.client_name ?? i.dp_orders?.client_name ?? '—',
+    clientPhone: i.client_phone ?? i.dp_orders?.client_phone ?? null,
     amount: i.amount,
     status: i.status,
     issuedAt: i.issued_at,
@@ -153,7 +155,7 @@ export interface AdminQuoteRow {
   clientName: string;
   clientPhone: string;
   productName: string;
-  city: string | null;
+  address: string | null;
   status: string;
   date: string;
 }
@@ -162,7 +164,7 @@ export async function getAdminQuotes(): Promise<AdminQuoteRow[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('dp_quotes')
-    .select('reference, client_name, client_phone, city, status, created_at, dp_quote_lines(description, dp_products(name))')
+    .select('reference, client_name, client_phone, address, status, created_at, dp_quote_lines(description, dp_products(name))')
     .order('created_at', { ascending: false });
   if (error || !data) return [];
 
@@ -171,7 +173,7 @@ export async function getAdminQuotes(): Promise<AdminQuoteRow[]> {
     clientName: q.client_name ?? '—',
     clientPhone: q.client_phone ?? '—',
     productName: q.dp_quote_lines?.[0]?.dp_products?.name?.fr ?? q.dp_quote_lines?.[0]?.description?.fr ?? '—',
-    city: q.city,
+    address: q.address,
     status: q.status,
     date: q.created_at,
   }));

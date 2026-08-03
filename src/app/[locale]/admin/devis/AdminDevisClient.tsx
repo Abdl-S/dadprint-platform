@@ -20,7 +20,7 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: '', phone: '', email: '', city: '', comments: '' });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', comments: '' });
   const [lines, setLines] = useState<Line[]>([{ qty: 1, description: '', unitPrice: 0 }]);
   const [pdfLoadingRef, setPdfLoadingRef] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ quote: AdminQuote; url: string; fileName: string } | null>(null);
@@ -62,11 +62,11 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
       const { reference } = await res.json();
       setQuotes((prev) => [{
         reference, clientName: form.name, clientPhone: form.phone,
-        productName: validLines[0].description, city: form.city || null,
+        productName: validLines[0].description, address: form.address || null,
         status: 'nouveau', date: new Date().toISOString(),
       }, ...prev]);
       setModalOpen(false);
-      setForm({ name: '', phone: '', email: '', city: '', comments: '' });
+      setForm({ name: '', phone: '', email: '', address: '', comments: '' });
       setLines([{ qty: 1, description: '', unitPrice: 0 }]);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Une erreur est survenue.');
@@ -140,7 +140,7 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <input placeholder="Email (optionnel)" aria-label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
-            <input placeholder="Ville" aria-label="Ville" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
+            <input placeholder="Adresse" aria-label="Adresse" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="rounded-md border border-ink-15 p-3 text-sm" />
           </div>
 
           <div>

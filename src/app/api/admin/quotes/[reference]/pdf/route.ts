@@ -12,7 +12,7 @@ function formatRefForDisplay(reference: string, prefix: string): string {
 export async function POST(request: Request, { params }: { params: { reference: string } }) {
   const supabase = createClient();
   const { data: quote, error } = await supabase
-    .from('dp_quotes').select('id, reference, client_name, city, created_at').eq('reference', params.reference).single();
+    .from('dp_quotes').select('id, reference, client_name, address, created_at').eq('reference', params.reference).single();
   if (error || !quote) return NextResponse.json({ error: 'Devis introuvable' }, { status: 404 });
 
   const { data: savedLines } = await supabase
@@ -36,7 +36,7 @@ export async function POST(request: Request, { params }: { params: { reference: 
     reference: formatRefForDisplay(quote.reference, 'DP-DEV-'),
     date: new Date(quote.created_at),
     clientName: quote.client_name ?? '—',
-    clientAddress: quote.city ?? undefined,
+    clientAddress: quote.address ?? undefined,
     lines,
   });
 

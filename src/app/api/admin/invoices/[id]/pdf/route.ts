@@ -12,7 +12,7 @@ function formatRefForDisplay(reference: string, prefix: string): string {
 export async function POST(_request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient();
   const { data: invoice, error } = await supabase
-    .from('dp_invoices').select('reference, issued_at, dp_orders(client_name, address_id)').eq('id', params.id).single();
+    .from('dp_invoices').select('reference, issued_at, client_name, client_address, dp_orders(client_name)').eq('id', params.id).single();
   if (error || !invoice) return NextResponse.json({ error: 'Facture introuvable' }, { status: 404 });
 
   const { data: savedLines } = await supabase
@@ -28,7 +28,8 @@ export async function POST(_request: Request, { params }: { params: { id: string
     kind: 'facture',
     reference: formatRefForDisplay(invoice.reference, 'DP-FAC-'),
     date: new Date(invoice.issued_at),
-    clientName: (invoice as any).dp_orders?.client_name ?? '—',
+    clientName: invoice.client_name ?? (invoice as any).dp_orders?.client_name ?? '—',
+    clientAddress: invoice.client_address ?? undefined,
     lines,
   });
 
