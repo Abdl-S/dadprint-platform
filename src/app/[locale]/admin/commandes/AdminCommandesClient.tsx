@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, Paperclip, FileText, Download, X } from 'lucide-react';
+import { Star, Paperclip, FileText, Download, X, MessageSquareText } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { applyOrderStatusChange } from '@/lib/automation/workflow';
 import { logActivity } from '@/lib/logs/store';
@@ -22,6 +22,7 @@ export function AdminCommandesClient({ initial, orderStatuses }: { initial: Admi
   const [orders, setOrders] = useState<AdminOrderRow[]>(initial);
   const [filter, setFilter] = useState<string | null>(null);
   const [filesModal, setFilesModal] = useState<{ order: AdminOrderRow; files: OrderFile[]; loading: boolean } | null>(null);
+  const [briefModal, setBriefModal] = useState<AdminOrderRow | null>(null);
   const router = useRouter();
 
   async function setStatus(ref: string, status: string) {
@@ -105,6 +106,11 @@ export function AdminCommandesClient({ initial, orderStatuses }: { initial: Admi
                     <span className="absolute -right-1.5 -top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-brand-magenta text-[9px] font-bold text-white">{o.fileCount}</span>
                   </button>
                 )}
+                {o.designBrief && (
+                  <button title="Voir le brief du client" onClick={() => setBriefModal(o)} className="text-ink-70 hover:text-ink">
+                    <MessageSquareText size={15} />
+                  </button>
+                )}
                 <button title="Créer un devis pour ce client" onClick={() => createQuoteFromOrder(o)} className="text-ink-40 hover:text-ink">
                   <FileText size={15} />
                 </button>
@@ -135,6 +141,23 @@ export function AdminCommandesClient({ initial, orderStatuses }: { initial: Admi
               ))}
             </div>
             <p className="mt-3 text-[11px] text-ink-40">Les liens de téléchargement expirent après quelques minutes, par sécurité.</p>
+          </div>
+        </div>
+      )}
+
+      {briefModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
+          <div className="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 shadow-raised">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="font-bold">Brief client — {briefModal.reference}</p>
+                <p className="text-xs text-ink-40">
+                  {briefModal.designChoice === 'needs_design' ? 'A besoin de création' : briefModal.designChoice === 'needs_edit' ? 'Demande une modification' : ''}
+                </p>
+              </div>
+              <button onClick={() => setBriefModal(null)} aria-label="Fermer" className="text-ink-40 hover:text-ink"><X size={18} /></button>
+            </div>
+            <p className="whitespace-pre-wrap rounded-md bg-ink-8 p-3 text-sm">{briefModal.designBrief}</p>
           </div>
         </div>
       )}

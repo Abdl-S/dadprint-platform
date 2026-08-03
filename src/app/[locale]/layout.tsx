@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Space_Mono, Noto_Sans_Arabic } from 'next/font/google';
 
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
@@ -19,18 +18,9 @@ import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 import '../globals.css';
 
 // Police d'interface — jamais utilisée pour le logo (le logo reste l'image officielle, intouchée)
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const spaceMono = Space_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-space-mono',
-  display: 'swap',
-});
-const notoArabic = Noto_Sans_Arabic({
-  subsets: ['arabic'],
-  variable: '--font-arabic',
-  display: 'swap',
-});
+const inter = { variable: '' };
+const spaceMono = { variable: '' };
+const notoArabic = { variable: '' };
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

@@ -75,13 +75,15 @@ export interface AdminOrderRow {
   date: string;
   paymentPreference: 'now_full' | 'now_deposit' | 'after_validation' | null;
   fileCount: number;
+  designChoice: string | null;
+  designBrief: string | null;
 }
 
 export async function getAdminOrders(): Promise<AdminOrderRow[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('dp_orders')
-    .select('id, reference, client_name, client_phone, status, created_at, total_amount, payment_preference, dp_order_lines(quantity, dp_products(name)), dp_files(id)')
+    .select('id, reference, client_name, client_phone, status, created_at, total_amount, payment_preference, design_choice, design_brief, dp_order_lines(quantity, dp_products(name)), dp_files(id)')
     .order('created_at', { ascending: false });
   if (error || !data) return [];
 
@@ -97,6 +99,8 @@ export async function getAdminOrders(): Promise<AdminOrderRow[]> {
     date: o.created_at,
     paymentPreference: o.payment_preference ?? null,
     fileCount: o.dp_files?.length ?? 0,
+    designChoice: o.design_choice ?? null,
+    designBrief: o.design_brief ?? null,
   }));
 }
 
