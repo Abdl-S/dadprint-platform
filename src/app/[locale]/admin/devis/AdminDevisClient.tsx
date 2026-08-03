@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, ArrowRightCircle, Download, Plus, Trash2 } from 'lucide-react';
+import { ArrowRightCircle, Download, Plus, Trash2 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
+import { PdfPreviewModal } from '@/components/admin/PdfPreviewModal';
 import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminQuoteRow } from '@/lib/data/admin';
 
@@ -22,6 +23,7 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
   const [form, setForm] = useState({ name: '', phone: '', email: '', city: '', comments: '' });
   const [lines, setLines] = useState<Line[]>([{ qty: 1, description: '', unitPrice: 0 }]);
   const [pdfLoadingRef, setPdfLoadingRef] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ quote: AdminQuote; url: string; fileName: string } | null>(null);
 
   async function setStatus(ref: string, status: AdminQuote['status']) {
     const previous = quotes;
@@ -73,7 +75,7 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
     }
   }
 
-  async function downloadPdf(q: AdminQuote, alsoSendWhatsApp: boolean) {
+  async function generateAndPreview(q: AdminQuote) {
     setPdfLoadingRef(q.reference);
     try {
       const res = await fetch(`/api/admin/quotes/${q.reference}/pdf`, { method: 'POST' });
@@ -83,16 +85,7 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${q.reference}.pdf`; a.click();
-      URL.revokeObjectURL(url);
-
-      if (alsoSendWhatsApp) {
-        // WhatsApp ne permet pas de joindre un fichier depuis un lien — le PDF vient d'être
-        // téléchargé, il ne reste qu'à le glisser dans la conversation qui s'ouvre ici.
-        const message = `Bonjour ${q.clientName},\n\nVoici votre devis DadPrint (réf. ${q.reference}), en pièce jointe.\n\nL'équipe DadPrint`;
-        window.open(buildWhatsAppUrlToClient(q.clientPhone, message), '_blank');
-      }
+      setPreview({ quote: q, url, fileName: `${q.reference}.pdf` });
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Une erreur est survenue.');
     } finally {
@@ -127,12 +120,11 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-2.5">
                 <button
-                  title="Générer le PDF et ouvrir WhatsApp" disabled={pdfLoadingRef === q.reference}
-                  onClick={() => downloadPdf(q, true)} className="text-success hover:text-success/70 disabled:opacity-40"
+                  title="Aperçu du PDF" disabled={pdfLoadingRef === q.reference}
+                  onClick={() => generateAndPreview(q)} className="text-ink-40 hover:text-ink disabled:opacity-40"
                 >
-                  {pdfLoadingRef === q.reference ? '…' : <Send size={14} />}
+                  {pdfLoadingRef === q.reference ? '…' : <Download size={14} />}
                 </button>
-                <button title="Télécharger le PDF" onClick={() => downloadPdf(q, false)} className="text-ink-40 hover:text-ink"><Download size={14} /></button>
                 <button title="Convertir en commande" onClick={() => convertToOrder(q.reference)} className="text-brand-magenta"><ArrowRightCircle size={16} /></button>
               </div>
             </td>
@@ -179,6 +171,24 @@ export function AdminDevisClient({ initial }: { initial: AdminQuoteRow[] }) {
           </button>
         </div>
       </AdminModal>
+
+      {preview && (
+        <PdfPreviewModal
+          pdfUrl={preview.url}
+          fileName={preview.fileName}
+          onClose={() => { URL.revokeObjectURL(preview.url); setPreview(null); }}
+          onDownload={() => {
+            const a = document.createElement('a');
+            a.href = preview.url; a.download = preview.fileName; a.click();
+          }}
+          onSendWhatsApp={() => {
+            // WhatsApp ne permet pas de joindre un fichier depuis un lien — le PDF a déjà été
+            // téléchargé ci-dessus, il ne reste qu'à le glisser dans la conversation qui s'ouvre ici.
+            const message = `Bonjour ${preview.quote.clientName},\n\nVoici votre devis DadPrint (réf. ${preview.quote.reference}), en pièce jointe.\n\nL'équipe DadPrint`;
+            window.open(buildWhatsAppUrlToClient(preview.quote.clientPhone, message), '_blank');
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Send, CheckCircle2, Download, Trash2 } from 'lucide-react';
+import { Plus, CheckCircle2, Download, Trash2 } from 'lucide-react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { StatusBadge } from '@/components/admin/StatusBadge';
+import { PdfPreviewModal } from '@/components/admin/PdfPreviewModal';
 import { buildWhatsAppUrlToClient } from '@/lib/whatsapp';
 import type { AdminInvoiceRow, AdminOrderRow } from '@/lib/data/admin';
 
@@ -18,6 +19,7 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
   const [orderReference, setOrderReference] = useState('');
   const [lines, setLines] = useState<Line[]>([{ qty: 1, description: '', unitPrice: 0 }]);
   const [pdfLoadingId, setPdfLoadingId] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ invoice: AdminInvoiceRow; url: string; fileName: string } | null>(null);
 
   function updateLine(i: number, patch: Partial<Line>) {
     setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
@@ -32,7 +34,7 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
     if (!res.ok) { setInvoices(previous); alert('La mise à jour a échoué.'); }
   }
 
-  async function downloadPdf(inv: AdminInvoiceRow, alsoSendWhatsApp: boolean) {
+  async function generateAndPreview(inv: AdminInvoiceRow) {
     setPdfLoadingId(inv.id);
     try {
       const res = await fetch(`/api/admin/invoices/${inv.id}/pdf`, { method: 'POST' });
@@ -42,17 +44,7 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${inv.reference}.pdf`; a.click();
-      URL.revokeObjectURL(url);
-
-      if (alsoSendWhatsApp) {
-        const order = orders.find((o) => o.reference === inv.orderReference);
-        const phone = order?.clientPhone;
-        if (!phone) { alert("Aucun numéro de téléphone associé à cette facture."); return; }
-        const message = `Bonjour ${inv.clientName},\n\nVoici votre facture DadPrint (réf. ${inv.reference}), en pièce jointe.\n\nMerci de votre confiance.\nL'équipe DadPrint`;
-        window.open(buildWhatsAppUrlToClient(phone, message), '_blank');
-      }
+      setPreview({ invoice: inv, url, fileName: `${inv.reference}.pdf` });
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Une erreur est survenue.');
     } finally {
@@ -108,10 +100,9 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
             <td className="px-4 py-3 text-xs text-ink-40">{new Date(inv.issuedAt).toLocaleDateString('fr-FR')}</td>
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-2.5">
-                <button title="Générer le PDF et ouvrir WhatsApp" disabled={pdfLoadingId === inv.id} onClick={() => downloadPdf(inv, true)} className="text-success hover:text-success/70 disabled:opacity-40">
-                  {pdfLoadingId === inv.id ? '…' : <Send size={14} />}
+                <button title="Aperçu du PDF" disabled={pdfLoadingId === inv.id} onClick={() => generateAndPreview(inv)} className="text-ink-40 hover:text-ink disabled:opacity-40">
+                  {pdfLoadingId === inv.id ? '…' : <Download size={14} />}
                 </button>
-                <button title="Télécharger le PDF" onClick={() => downloadPdf(inv, false)} className="text-ink-40 hover:text-ink"><Download size={14} /></button>
                 {inv.status !== 'payee' && (
                   <button title="Marquer payée" onClick={() => markPaid(inv.id, 'payee')} className="text-ink-40 hover:text-ink"><CheckCircle2 size={16} /></button>
                 )}
@@ -157,6 +148,27 @@ export function AdminFacturesClient({ initial, orders }: { initial: AdminInvoice
           <button onClick={createInvoice} disabled={saving} className="w-full rounded-lg bg-ink py-3 text-sm font-bold text-paper disabled:opacity-60">{saving ? 'Création...' : 'Créer la facture'}</button>
         </div>
       </AdminModal>
+
+      {preview && (
+        <PdfPreviewModal
+          pdfUrl={preview.url}
+          fileName={preview.fileName}
+          onClose={() => { URL.revokeObjectURL(preview.url); setPreview(null); }}
+          onDownload={() => {
+            const a = document.createElement('a');
+            a.href = preview.url; a.download = preview.fileName; a.click();
+          }}
+          onSendWhatsApp={() => {
+            const order = orders.find((o) => o.reference === preview.invoice.orderReference);
+            const phone = order?.clientPhone;
+            if (!phone) { alert("Aucun numéro de téléphone associé à cette facture."); return; }
+            // WhatsApp ne permet pas de joindre un fichier depuis un lien — le PDF a déjà été
+            // téléchargé ci-dessus, il ne reste qu'à le glisser dans la conversation qui s'ouvre ici.
+            const message = `Bonjour ${preview.invoice.clientName},\n\nVoici votre facture DadPrint (réf. ${preview.invoice.reference}), en pièce jointe.\n\nMerci de votre confiance.\nL'équipe DadPrint`;
+            window.open(buildWhatsAppUrlToClient(phone, message), '_blank');
+          }}
+        />
+      )}
     </div>
   );
 }
