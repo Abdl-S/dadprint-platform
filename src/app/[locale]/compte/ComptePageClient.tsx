@@ -16,6 +16,7 @@ import { invoices, clientFiles, brandKits, clientNotifications, deliveryAddresse
 import { products, testimonials } from '@/lib/mock/data';
 import { useFavorites } from '@/lib/favorites/context';
 import { useAuth } from '@/lib/auth/context';
+import { createClient } from '@/lib/supabase/client';
 import type { Locale } from '@/types';
 import type { MyOrder } from '@/lib/data/content';
 
@@ -45,6 +46,37 @@ function ComptePageContent({ orders, profile }: { orders: MyOrder[]; profile: { 
   const [name, setName] = useState(profile.name);
   const [phone, setPhone] = useState(profile.phone);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPasswordMessage(null);
+
+    if (newPassword.length < 6) {
+      setPasswordMessage({ type: 'error', text: 'Le mot de passe doit contenir au moins 6 caractères.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'Les deux mots de passe ne correspondent pas.' });
+      return;
+    }
+
+    setChangingPassword(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setChangingPassword(false);
+
+    if (error) {
+      setPasswordMessage({ type: 'error', text: "Échec du changement de mot de passe. Réessayez." });
+      return;
+    }
+    setPasswordMessage({ type: 'success', text: 'Mot de passe mis à jour avec succès.' });
+    setNewPassword('');
+    setConfirmPassword('');
+  }
   const { favorites } = useFavorites();
 
   useEffect(() => {
@@ -115,6 +147,32 @@ function ComptePageContent({ orders, profile }: { orders: MyOrder[]; profile: { 
                   <Button type="submit" variant="magenta" loading={savingProfile} disabled={savingProfile}>{t('save')}</Button>
                   <Button type="button" variant="outline" onClick={() => { signOut(); router.push('/'); }}>{t('signOut')}</Button>
                 </div>
+              </form>
+            )}
+
+            {tab === 'profil' && (
+              <form onSubmit={handleChangePassword} className="mt-8 max-w-md space-y-4 border-t border-ink-8 pt-8">
+                <h3 className="text-sm font-bold">Changer le mot de passe</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <input
+                    type="password" placeholder="Nouveau mot de passe" aria-label="Nouveau mot de passe"
+                    value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
+                    className="rounded-md border border-ink-15 p-3 text-sm"
+                  />
+                  <input
+                    type="password" placeholder="Confirmer le mot de passe" aria-label="Confirmer le mot de passe"
+                    value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="rounded-md border border-ink-15 p-3 text-sm"
+                  />
+                </div>
+                {passwordMessage && (
+                  <p className={`rounded-md p-3 text-sm ${passwordMessage.type === 'success' ? 'border border-success/30 bg-success/5 text-success' : 'border border-danger/30 bg-danger/5 text-danger'}`}>
+                    {passwordMessage.text}
+                  </p>
+                )}
+                <Button type="submit" variant="outline" loading={changingPassword} disabled={changingPassword}>
+                  Mettre à jour le mot de passe
+                </Button>
               </form>
             )}
 
