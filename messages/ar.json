@@ -165,7 +165,16 @@
     "confirmedTitle": "تم إرسال الطلب!",
     "confirmedDesc": "سنرد عليك بسرعة عبر واتساب. احتفظ بهذا الرقم لمتابعة طلبك.",
     "trackCta": "تتبع طلبي",
-    "submitError": "حدث خطأ. تحقق من اتصالك وحاول مرة أخرى."
+    "submitError": "حدث خطأ. تحقق من اتصالك وحاول مرة أخرى.",
+    "paymentStepTitle": "الدفع",
+    "paymentStepSubtitle": "اختر متى تريد الدفع.",
+    "paymentChoice": {
+      "now_full": "الدفع الآن",
+      "now_deposit": "دفع عربون",
+      "after_validation": "الدفع بعد التأكيد"
+    },
+    "afterValidationNote": "لا يُطلب أي دفع الآن. سيتحقق فريقنا أولاً من طلبك، ثم يتواصل معك بخصوص الدفع.",
+    "reassurance": "رد سريع من فريقنا — دون أي التزام."
   },
   "designStep": {
     "question": "هل لديك تصميمك الخاص بالفعل؟",

@@ -194,6 +194,7 @@ export function DynamicOrderForm({ product }: { product: Product }) {
   const [city, setCity] = useState('');
   const [instructions, setInstructions] = useState('');
   const [paymentProvider, setPaymentProvider] = useState<PaymentProvider | null>(null);
+  const [paymentPreference, setPaymentPreference] = useState<'now_full' | 'now_deposit' | 'after_validation' | ''>('');
   const [reference, setReference] = useState<string | null>(null);
   const [website, setWebsite] = useState(''); // honeypot anti-spam — un humain ne remplit jamais ce champ invisible
   const [submitting, setSubmitting] = useState(false);
@@ -227,6 +228,7 @@ export function DynamicOrderForm({ product }: { product: Product }) {
           options: { ...options, commentaires: commentsField ? values[commentsField.key] : undefined },
           deliveryMode: delivery,
           designChoice,
+          paymentPreference: paymentPreference || undefined,
         }),
       });
 
@@ -337,7 +339,38 @@ export function DynamicOrderForm({ product }: { product: Product }) {
       </fieldset>
 
       {!isQuoteOnlyMode(product.pricingMode) && (
-        <PaymentMethodPicker onChange={(p) => setPaymentProvider(p)} />
+        <fieldset className="rounded-xl border-2 border-ink p-5 sm:p-6">
+          <legend className="px-2 text-sm font-bold">{t('paymentStepTitle')}</legend>
+          <p className="mb-4 text-xs text-ink-70">{t('paymentStepSubtitle')}</p>
+
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            {(['now_full', 'now_deposit', 'after_validation'] as const).map((choice) => (
+              <label
+                key={choice}
+                className={`relative cursor-pointer rounded-lg border-2 p-3.5 text-center text-sm font-semibold transition-all duration-200 ease-premium focus-within:ring-2 focus-within:ring-brand-cyan focus-within:ring-offset-2 ${
+                  paymentPreference === choice ? 'border-ink bg-ink text-paper shadow-card' : 'border-ink-15 hover:border-ink-40'
+                }`}
+              >
+                <input
+                  type="radio" name="payment-preference" value={choice}
+                  checked={paymentPreference === choice} onChange={() => setPaymentPreference(choice)}
+                  className="sr-only" required
+                />
+                {paymentPreference === choice && <CheckCircle2 size={14} className="absolute -top-1.5 -end-1.5 rounded-full bg-paper text-success" />}
+                {t(`paymentChoice.${choice}`)}
+              </label>
+            ))}
+          </div>
+
+          {(paymentPreference === 'now_full' || paymentPreference === 'now_deposit') && (
+            <div className="mt-4">
+              <PaymentMethodPicker onChange={(p) => setPaymentProvider(p)} />
+            </div>
+          )}
+          {paymentPreference === 'after_validation' && (
+            <p className="mt-4 rounded-md bg-ink-8 p-3 text-xs text-ink-70">{t('afterValidationNote')}</p>
+          )}
+        </fieldset>
       )}
 
       {submitError && (
@@ -347,6 +380,7 @@ export function DynamicOrderForm({ product }: { product: Product }) {
       <Button type="submit" variant="magenta" size="lg" className="w-full" loading={submitting} disabled={submitting}>
         {t('submit')}
       </Button>
+      <p className="text-center text-xs text-ink-40">{t('reassurance')}</p>
     </form>
   );
 }

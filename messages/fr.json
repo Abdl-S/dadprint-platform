@@ -165,7 +165,16 @@
     "confirmedTitle": "Commande envoyée !",
     "confirmedDesc": "On vous répond rapidement sur WhatsApp. Gardez cette référence pour suivre votre commande.",
     "trackCta": "Suivre ma commande",
-    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez."
+    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez.",
+    "paymentStepTitle": "Paiement",
+    "paymentStepSubtitle": "Choisissez quand vous souhaitez payer.",
+    "paymentChoice": {
+      "now_full": "Payer maintenant",
+      "now_deposit": "Faire une avance",
+      "after_validation": "Payer après validation"
+    },
+    "afterValidationNote": "Aucun paiement n'est demandé maintenant. Notre équipe validera d'abord votre commande, puis vous recontactera pour le paiement.",
+    "reassurance": "Réponse rapide de notre équipe — sans engagement."
   },
   "designStep": {
     "question": "Possédez-vous déjà votre design ?",

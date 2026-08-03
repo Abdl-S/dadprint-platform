@@ -165,7 +165,16 @@
     "confirmedTitle": "Order sent!",
     "confirmedDesc": "We'll reply quickly on WhatsApp. Keep this reference to track your order.",
     "trackCta": "Track my order",
-    "submitError": "Something went wrong. Check your connection and try again."
+    "submitError": "Something went wrong. Check your connection and try again.",
+    "paymentStepTitle": "Payment",
+    "paymentStepSubtitle": "Choose when you want to pay.",
+    "paymentChoice": {
+      "now_full": "Pay now",
+      "now_deposit": "Pay a deposit",
+      "after_validation": "Pay after validation"
+    },
+    "afterValidationNote": "No payment is requested now. Our team will validate your order first, then contact you for payment.",
+    "reassurance": "Fast response from our team — no commitment."
   },
   "designStep": {
     "question": "Do you already have your design?",
