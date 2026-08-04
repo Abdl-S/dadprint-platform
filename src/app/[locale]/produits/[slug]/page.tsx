@@ -16,6 +16,12 @@ import { getTestimonials, getPortfolioItems } from '@/lib/data/content';
 import { getComplementaryProducts } from '@/lib/recommendations/engine';
 import type { Metadata } from 'next';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export async function generateStaticParams() {
   const products = await getProducts();
   return products.map((p) => ({ slug: p.slug }));
@@ -36,6 +42,7 @@ export async function generateMetadata({
 export default async function ProductDetailPage({
   params: { locale, slug },
 }: { params: { locale: Locale; slug: string } }) {
+  noStore();
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 

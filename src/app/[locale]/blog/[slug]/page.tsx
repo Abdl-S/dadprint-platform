@@ -7,6 +7,12 @@ import { blogArticles } from '@/lib/mock/blog';
 import type { Locale } from '@/types';
 import type { Metadata } from 'next';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export function generateStaticParams() {
   return blogArticles.map((a) => ({ slug: a.slug }));
 }
@@ -22,6 +28,7 @@ export async function generateMetadata({
 export default async function BlogArticlePage({
   params: { locale, slug },
 }: { params: { locale: Locale; slug: string } }) {
+  noStore();
   const article = blogArticles.find((a) => a.slug === slug);
   if (!article) notFound();
   setRequestLocale(locale);

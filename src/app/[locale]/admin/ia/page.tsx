@@ -1,5 +1,10 @@
 import { Sparkles, FileText, Search, Lightbulb, Calendar, MessageCircle } from 'lucide-react';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 const features = [
   { icon: FileText, title: 'Génération de descriptions', desc: 'Rédige automatiquement la description courte et détaillée d\'un nouveau produit.' },
   { icon: Search, title: 'SEO assisté', desc: 'Suggère titres, meta descriptions et mots-clés pour chaque page ou article.' },

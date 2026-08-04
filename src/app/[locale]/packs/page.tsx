@@ -7,6 +7,12 @@ import { getPacks } from '@/lib/data/content';
 import type { Locale } from '@/types';
 import type { Metadata } from 'next';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export async function generateMetadata({ params: { locale } }: { params: { locale: Locale } }): Promise<Metadata> {
   const titles = { fr: 'Nos Packs', en: 'Our Packs', ar: 'باقاتنا' };
   const descriptions = {
@@ -18,6 +24,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 }
 
 export default async function PacksPage({ params: { locale } }: { params: { locale: Locale } }) {
+  noStore();
   setRequestLocale(locale);
   const t = await getTranslations('packsPage');
   const packs = await getPacks();

@@ -5,7 +5,14 @@ import { Button } from '@/components/ui/Button';
 import { PenTool, Printer, Truck, HeartHandshake } from 'lucide-react';
 import type { Locale } from '@/types';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export default async function AProposPage({ params: { locale } }: { params: { locale: Locale } }) {
+  noStore();
   setRequestLocale(locale);
   const t = await getTranslations('aboutPage');
   const pillars = [

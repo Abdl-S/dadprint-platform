@@ -4,6 +4,12 @@ import { getCategories } from '@/lib/data/catalog';
 import { getPortfolioItems } from '@/lib/data/content';
 import { RealisationsPageClient } from './RealisationsPageClient';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export async function generateMetadata({ params: { locale } }: { params: { locale: Locale } }): Promise<Metadata> {
   const titles = { fr: 'Nos réalisations', en: 'Our work', ar: 'أعمالنا' };
   const descriptions = {
@@ -15,6 +21,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 }
 
 export default async function RealisationsPage() {
+  noStore();
   const [categories, portfolioItems] = await Promise.all([getCategories(), getPortfolioItems()]);
   return <RealisationsPageClient categories={categories} portfolioItems={portfolioItems} />;
 }

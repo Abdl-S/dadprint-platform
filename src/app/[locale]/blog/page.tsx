@@ -7,11 +7,18 @@ import { blogArticles } from '@/lib/mock/blog';
 import type { Locale } from '@/types';
 import type { Metadata } from 'next';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export async function generateMetadata({ params: { locale } }: { params: { locale: Locale } }): Promise<Metadata> {
   return { title: locale === 'fr' ? 'Conseils & Inspirations' : locale === 'en' ? 'Tips & Inspiration' : 'نصائح وإلهام' };
 }
 
 export default async function BlogPage({ params: { locale } }: { params: { locale: Locale } }) {
+  noStore();
   setRequestLocale(locale);
   const t = await getTranslations('blogPage');
 

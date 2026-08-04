@@ -15,6 +15,12 @@ import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { FaqSection } from '@/components/home/FaqSection';
 import { ContactSection } from '@/components/home/ContactSection';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 /**
  * Page d'accueil — composition de toutes les sections demandées.
  * Chaque section est un composant indépendant dans components/home/ :
@@ -26,6 +32,7 @@ import { ContactSection } from '@/components/home/ContactSection';
  * devoir d'abord choisir une catégorie.
  */
 export default async function HomePage({ params: { locale } }: { params: { locale: Locale } }) {
+  noStore();
   setRequestLocale(locale);
 
   const [products, portfolioItems, testimonials, clientCompanies, faq] = await Promise.all([

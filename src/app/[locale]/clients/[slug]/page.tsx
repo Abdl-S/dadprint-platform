@@ -5,6 +5,12 @@ import { Section } from '@/components/ui/Section';
 import { getClientCompanies, getPortfolioItems } from '@/lib/data/content';
 import type { Locale } from '@/types';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 export async function generateStaticParams() {
   const clientCompanies = await getClientCompanies();
   return clientCompanies.map((c) => ({ slug: c.slug }));
@@ -13,6 +19,7 @@ export async function generateStaticParams() {
 export default async function ClientDetailPage({
   params: { slug, locale },
 }: { params: { slug: string; locale: Locale } }) {
+  noStore();
   const [clientCompanies, portfolioItems] = await Promise.all([getClientCompanies(), getPortfolioItems()]);
   const client = clientCompanies.find((c) => c.slug === slug);
   if (!client) notFound();

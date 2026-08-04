@@ -3,12 +3,19 @@ import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import type { Locale } from '@/types';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 /**
  * ⚠️ Texte-cadre générique — à faire relire et valider (idéalement par un
  * juriste) avant mise en ligne réelle, notamment les clauses de paiement,
  * livraison et rétractation propres au droit mauritanien.
  */
 export default async function ConditionsGeneralesPage({ params: { locale } }: { params: { locale: Locale } }) {
+  noStore();
   setRequestLocale(locale);
   const t = await getTranslations('termsPage');
 

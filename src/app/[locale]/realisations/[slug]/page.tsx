@@ -8,6 +8,12 @@ import { getPortfolioItems } from '@/lib/data/content';
 import { getCategories } from '@/lib/data/catalog';
 import type { Locale } from '@/types';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 /**
  * Slug basé sur l'id pour l'instant (le mock n'a pas de slug dédié par item) —
  * le futur module Supabase ajoutera un vrai `slug` par réalisation sans
@@ -21,6 +27,7 @@ export async function generateStaticParams() {
 export default async function RealisationDetailPage({
   params: { locale, slug },
 }: { params: { locale: Locale; slug: string } }) {
+  noStore();
   const [portfolioItems, categories] = await Promise.all([getPortfolioItems(), getCategories()]);
   const item = portfolioItems.find((p) => p.id === slug);
   if (!item) notFound();

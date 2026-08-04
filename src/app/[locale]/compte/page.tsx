@@ -4,6 +4,12 @@ import { getMyOrders } from '@/lib/data/content';
 import type { Locale } from '@/types';
 import { ComptePageClient } from './ComptePageClient';
 
+/** Toujours interroger Supabase à la requête — jamais mis en cache comme page statique (sinon les modifications admin n'apparaîtraient qu'au prochain déploiement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+import { unstable_noStore as noStore } from 'next/cache';
+
+
 /**
  * Espace client — protégé : redirige vers /connexion si personne n'est
  * authentifié. Les commandes affichées dans l'onglet "Devis" sont réelles
@@ -14,6 +20,7 @@ import { ComptePageClient } from './ComptePageClient';
  * étape par souci de temps.
  */
 export default async function ComptePage({ params: { locale } }: { params: { locale: Locale } }) {
+  noStore();
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
