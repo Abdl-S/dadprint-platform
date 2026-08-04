@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
@@ -11,13 +12,15 @@ import type { Locale, Product } from '@/types';
  * Remplace l'ancienne grille de catégories sur l'accueil — le client voit
  * directement de vrais produits (photo, nom, prix) et clique dessus pour
  * arriver droit sur la fiche produit avec ses spécifications, plutôt que de
- * devoir d'abord choisir une catégorie. Affiche les 10 premiers produits
- * disponibles ; "Voir tout le catalogue" reste pour la vue complète filtrable.
+ * devoir d'abord choisir une catégorie. Affiche 9 produits + la carte
+ * "Autre chose" (même logique que sur le catalogue complet) pour que ce
+ * point d'entrée soit visible sans avoir à cliquer "Voir tout le catalogue".
  */
 export function ProductsPreview({ products }: { products: Product[] }) {
   const t = useTranslations('categories');
+  const catalogT = useTranslations('catalog');
   const locale = useLocale() as Locale;
-  const featured = products.slice(0, 10);
+  const featured = products.slice(0, 9);
 
   if (featured.length === 0) return null;
 
@@ -51,6 +54,15 @@ export function ProductsPreview({ products }: { products: Product[] }) {
               </div>
             </Link>
           ))}
+
+          {/* Carte "Autre chose" — même logique et même style que sur le catalogue complet */}
+          <Link
+            href="/produits/autre"
+            className="group flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand-yellow bg-ink p-4 text-center text-paper shadow-soft transition-all duration-300 ease-premium hover:-translate-y-1 hover:shadow-card"
+          >
+            <Sparkles size={22} className="text-brand-yellow transition-transform group-hover:scale-110" />
+            <p className="text-sm font-bold">{catalogT('otherCardTitle')}</p>
+          </Link>
         </div>
 
         <Link href="/produits" className="mt-6 block text-center text-sm font-bold underline sm:hidden">{t('seeAll')}</Link>
