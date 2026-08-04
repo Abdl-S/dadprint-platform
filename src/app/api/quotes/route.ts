@@ -33,5 +33,9 @@ export async function POST(request: Request) {
     await supabase.from('dp_quote_lines').insert({ quote_id: quote.id, product_id: productId, quantity, options: options ?? {} });
   }
 
+  await supabase.from('dp_notifications').insert({
+    title: 'Nouveau devis', body: `${reference} — ${name}`, reference, channels: ['app'],
+  });
+
   return NextResponse.json({ reference, id: quote.id }, { status: 201 });
 }

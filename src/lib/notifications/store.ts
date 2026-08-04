@@ -27,10 +27,7 @@ export interface StaffNotification {
   read: boolean;
 }
 
-let notifications: StaffNotification[] = [
-  { id: 'sn1', targetRoles: ['commercial', 'administrateur'], title: 'Nouvelle commande', body: 'DP-CMD-20260730-5521 — Sahara Events', channels: ['app', 'email'], createdAt: new Date().toISOString(), read: false },
-  { id: 'sn2', targetRoles: ['graphiste'], title: 'Nouveau projet à concevoir', body: 'Casquette personnalisée — Salon Éclat', channels: ['app'], createdAt: new Date().toISOString(), read: false },
-];
+let notifications: StaffNotification[] = [];
 
 const listeners = new Set<() => void>();
 

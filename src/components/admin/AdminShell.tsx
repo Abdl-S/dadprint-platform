@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 // pathname vient de '@/i18n/navigation' (voir import ci-dessus) — jamais préfixé par la langue, cohérent avec les hrefs bruts du menu
 import { Link, usePathname } from '@/i18n/navigation';
 import {
@@ -9,7 +9,6 @@ import {
   CreditCard, ShieldCheck, BarChart3, Sparkles, Menu, X, LogOut, Bell, Receipt, HelpCircle,
 } from 'lucide-react';
 import { useAdminAuth, type AdminRole } from '@/lib/admin/auth-context';
-import { useStaffNotifications, markRead } from '@/lib/notifications/store';
 import { Logo } from '@/components/brand/Logo';
 
 /**
@@ -77,13 +76,43 @@ const nav = [
   ]},
 ];
 
+interface AdminNotification {
+  id: string;
+  title: string;
+  body: string;
+  reference: string | null;
+  channels: string[];
+  read: boolean;
+  created_at: string;
+}
+
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { session, logout } = useAdminAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const myNotifications = useStaffNotifications(session?.role);
+  const [notifState, setNotifState] = useState<AdminNotification[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch('/api/admin/notifications');
+      if (res.ok) {
+        const { data } = await res.json();
+        setNotifState(data ?? []);
+      }
+    }
+    load();
+    const interval = setInterval(load, 30_000); // vérifie les nouvelles notifications toutes les 30 secondes
+    return () => clearInterval(interval);
+  }, []);
+
+  const myNotifications = notifState;
   const unread = myNotifications.filter((n) => !n.read).length;
+
+  async function markRead(id: string) {
+    setNotifState((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    await fetch(`/api/admin/notifications/${id}`, { method: 'PATCH' });
+  }
 
   const activeLabel = nav.flatMap((s) => s.items).find((i) => pathname === i.href || pathname?.endsWith(i.href))?.label ?? 'Tableau de bord';
 
