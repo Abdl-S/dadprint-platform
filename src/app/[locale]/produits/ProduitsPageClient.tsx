@@ -9,6 +9,7 @@ import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import { PriceDisplay } from '@/components/ui/PriceDisplay';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
+import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Locale, Category, Product } from '@/types';
 
@@ -114,6 +115,16 @@ export function ProduitsPageClient({ categories, products }: { categories: Categ
               </div>
             </Link>
           ))}
+
+          {/* Carte "Autre chose" — visuellement distincte, jamais confondue avec un vrai produit */}
+          <Link
+            href="/produits/autre"
+            className="group flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand-yellow bg-ink p-5 text-center text-paper shadow-soft transition-all duration-300 ease-premium hover:-translate-y-1 hover:shadow-card"
+          >
+            <Sparkles size={26} className="text-brand-yellow transition-transform group-hover:scale-110" />
+            <p className="font-bold">{t('otherCardTitle')}</p>
+            <p className="text-xs text-paper/60">{t('otherCardSubtitle')}</p>
+          </Link>
         </div>
 
         {filtered.length === 0 && <p className="mt-10 text-center text-ink-40">{t('empty')}</p>}

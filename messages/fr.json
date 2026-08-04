@@ -134,7 +134,9 @@
     "title": "Nos produits",
     "subtitle": "Un catalogue complet, filtrable par catégorie — du textile au grand format.",
     "all": "Tout",
-    "empty": "Aucun produit dans cette catégorie pour le moment."
+    "empty": "Aucun produit dans cette catégorie pour le moment.",
+    "otherCardTitle": "Autre chose ?",
+    "otherCardSubtitle": "Vous ne trouvez pas ce qu'il vous faut ?"
   },
   "product": {
     "breadcrumbCatalog": "Catalogue",
@@ -509,5 +511,25 @@
     "loginLink": "Se connecter",
     "checkEmailTitle": "Vérifiez votre email",
     "checkEmailDesc": "Un lien de confirmation vous a été envoyé pour activer votre compte."
+  },
+  "customRequest": {
+    "eyebrow": "Demande personnalisée",
+    "title": "Dites-nous ce dont vous avez besoin",
+    "subtitle": "Vous ne trouvez pas exactement ce que vous cherchez dans notre catalogue ? Décrivez votre projet, on revient vers vous rapidement avec un devis adapté.",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "description": "Décrivez ce dont vous avez besoin",
+    "descriptionPlaceholder": "Ex : J'ai besoin de 200 porte-clés personnalisés avec le logo de mon entreprise...",
+    "quantity": "Quantité approximative",
+    "quantityPlaceholder": "Ex : 200",
+    "optional": "optionnel",
+    "photo": "Photo ou exemple",
+    "submit": "Envoyer ma demande →",
+    "reassurance": "Réponse rapide de notre équipe — sans engagement.",
+    "submitError": "Une erreur est survenue. Vérifiez votre connexion et réessayez.",
+    "confirmedTitle": "Demande envoyée !",
+    "confirmedDesc": "On vous répond rapidement sur WhatsApp pour préciser votre besoin et vous proposer un devis. Gardez cette référence pour suivre votre demande.",
+    "trackCta": "Suivre ma demande",
+    "whatsappProductLabel": "Demande personnalisée (Autre chose)"
   }
 }

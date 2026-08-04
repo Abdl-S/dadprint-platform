@@ -134,7 +134,9 @@
     "title": "Our products",
     "subtitle": "A complete catalog, filterable by category — from apparel to large format.",
     "all": "All",
-    "empty": "No products in this category yet."
+    "empty": "No products in this category yet.",
+    "otherCardTitle": "Something else?",
+    "otherCardSubtitle": "Can't find what you need?"
   },
   "product": {
     "breadcrumbCatalog": "Catalog",
@@ -509,5 +511,25 @@
     "loginLink": "Sign in",
     "checkEmailTitle": "Check your email",
     "checkEmailDesc": "A confirmation link has been sent to activate your account."
+  },
+  "customRequest": {
+    "eyebrow": "Custom request",
+    "title": "Tell us what you need",
+    "subtitle": "Can't find exactly what you're looking for in our catalog? Describe your project, we'll get back to you quickly with a tailored quote.",
+    "name": "Full name",
+    "phone": "Phone",
+    "description": "Describe what you need",
+    "descriptionPlaceholder": "E.g.: I need 200 custom keychains with my company logo...",
+    "quantity": "Approximate quantity",
+    "quantityPlaceholder": "E.g.: 200",
+    "optional": "optional",
+    "photo": "Photo or example",
+    "submit": "Send my request →",
+    "reassurance": "Fast response from our team — no commitment.",
+    "submitError": "Something went wrong. Check your connection and try again.",
+    "confirmedTitle": "Request sent!",
+    "confirmedDesc": "We'll get back to you quickly on WhatsApp to clarify your needs and offer a quote. Keep this reference to track your request.",
+    "trackCta": "Track my request",
+    "whatsappProductLabel": "Custom request (Other)"
   }
 }
