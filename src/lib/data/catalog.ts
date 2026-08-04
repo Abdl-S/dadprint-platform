@@ -58,7 +58,7 @@ function mapFormFields(rows: any[]): OrderFormField[] {
 
 export async function getProducts(categorySlug?: string, includeUnavailable = false): Promise<Product[]> {
   const supabase = createClient();
-  let query = supabase.from('dp_products').select('*, dp_categories(slug)');
+  let query = supabase.from('dp_products').select('*, dp_categories(slug)').order('created_at', { ascending: false });
   if (!includeUnavailable) query = query.eq('available', true);
   const { data, error } = await query;
   if (error || !data) return [];

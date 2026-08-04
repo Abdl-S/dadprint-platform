@@ -20,7 +20,8 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
   const { data, error } = await supabase
     .from('dp_profiles')
     .select('id, full_name, email, active, dp_roles!inner(key)')
-    .neq('dp_roles.key', 'client');
+    .neq('dp_roles.key', 'client')
+    .order('created_at', { ascending: false });
   if (error || !data) return [];
 
   return data.map((u: any) => ({

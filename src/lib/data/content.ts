@@ -14,7 +14,7 @@ export async function getFaq(): Promise<FaqItemRow[]> {
 
 export async function getPacks(): Promise<Pack[]> {
   const supabase = createClient();
-  const { data: packs, error } = await supabase.from('dp_packs').select('*').eq('active', true);
+  const { data: packs, error } = await supabase.from('dp_packs').select('*').eq('active', true).order('created_at', { ascending: false });
   if (error || !packs) return [];
 
   const { data: links } = await supabase.from('dp_pack_products').select('pack_id, dp_products(slug)');
@@ -38,7 +38,7 @@ export async function getPackBySlug(slug: string): Promise<Pack | null> {
 
 export async function getPortfolioItems(categorySlug?: string): Promise<PortfolioItem[]> {
   const supabase = createClient();
-  const { data, error } = await supabase.from('dp_portfolio_items').select('*, dp_categories(slug)').eq('published', true);
+  const { data, error } = await supabase.from('dp_portfolio_items').select('*, dp_categories(slug)').eq('published', true).order('created_at', { ascending: false });
   if (error || !data) return [];
 
   const filtered = categorySlug ? data.filter((i) => i.dp_categories?.slug === categorySlug) : data;
@@ -55,7 +55,7 @@ export async function getPortfolioItems(categorySlug?: string): Promise<Portfoli
 
 export async function getClientCompanies(): Promise<ClientCompany[]> {
   const supabase = createClient();
-  const { data, error } = await supabase.from('dp_companies').select('*').eq('publish_consent', true);
+  const { data, error } = await supabase.from('dp_companies').select('*').eq('publish_consent', true).order('created_at', { ascending: false });
   if (error || !data) return [];
 
   return data.map((c) => ({
