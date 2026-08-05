@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateSequentialReference } from '@/lib/orders/sequentialReference';
+import { notifyRole } from '@/lib/notifications/notify';
 
 /** POST /api/quotes — crée un devis + sa ligne. Ouvert au public (formulaire visiteur). */
 export async function POST(request: Request) {
@@ -33,10 +34,7 @@ export async function POST(request: Request) {
     await supabase.from('dp_quote_lines').insert({ quote_id: quote.id, product_id: productId, quantity, options: options ?? {} });
   }
 
-  const { data: commercialRole } = await supabase.from('dp_roles').select('id').eq('key', 'commercial').single();
-  await supabase.from('dp_notifications').insert({
-    title: 'Nouveau devis', body: `${reference} — ${name}`, reference, channels: ['app'], target_role_id: commercialRole?.id ?? null,
-  });
+  await notifyRole(supabase, 'commercial', 'Nouveau devis', `${reference} — ${name}`, reference);
 
   return NextResponse.json({ reference, id: quote.id }, { status: 201 });
 }

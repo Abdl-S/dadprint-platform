@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateSequentialReference } from '@/lib/orders/sequentialReference';
+import { notifyRole } from '@/lib/notifications/notify';
 
 /** POST /api/orders — crée une commande (avec ou sans produit précis rattaché). Déclenche aussi une notification interne (via trigger applicatif côté admin). */
 export async function POST(request: Request) {
@@ -36,10 +37,7 @@ export async function POST(request: Request) {
     await supabase.from('dp_order_lines').insert({ order_id: order.id, product_id: productId, quantity: quantity ?? 1, unit_price: unitPrice ?? null, options: options ?? {} });
   }
 
-  const { data: commercialRole } = await supabase.from('dp_roles').select('id').eq('key', 'commercial').single();
-  await supabase.from('dp_notifications').insert({
-    title: 'Nouvelle commande', body: `${reference} — ${name}`, reference, channels: ['app'], target_role_id: commercialRole?.id ?? null,
-  });
+  await notifyRole(supabase, 'commercial', 'Nouvelle commande', `${reference} — ${name}`, reference);
 
   return NextResponse.json({ reference, id: order.id }, { status: 201 });
 }

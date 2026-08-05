@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { notifyRole } from '@/lib/notifications/notify';
 
 /** POST /api/contact — enregistre un message du formulaire de contact et notifie l'équipe. Ouvert au public. */
 export async function POST(request: Request) {
@@ -10,10 +11,7 @@ export async function POST(request: Request) {
   const { error } = await supabase.from('dp_contact_messages').insert({ name, phone: phone || null, email: email || null, message });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const { data: supportRole } = await supabase.from('dp_roles').select('id').eq('key', 'support').single();
-  await supabase.from('dp_notifications').insert({
-    title: 'Nouveau message de contact', body: `${name} — ${message.slice(0, 80)}`, channels: ['app'], target_role_id: supportRole?.id ?? null,
-  });
+  await notifyRole(supabase, 'support', 'Nouveau message de contact', `${name} — ${message.slice(0, 80)}`);
 
   return NextResponse.json({ success: true }, { status: 201 });
 }
