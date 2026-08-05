@@ -10,12 +10,18 @@ import { buildWhatsAppUrl } from '@/lib/whatsapp';
  * mis en évidence, collage photo + carte "Palette du projet" flottante,
  * barre de statistiques sous les CTA.
  *
+ * Le collage affiche désormais de vraies photos de produits (choisies côté
+ * page d'accueil, différentes à chaque chargement) plutôt que des photos de
+ * stock fixes — dès qu'un produit obtient une vraie photo dans l'admin,
+ * elle peut apparaître ici.
+ *
  * ⚠️ Les chiffres de `home.stats` (commandes livrées, délai moyen, note de
  * satisfaction) sont des EXEMPLES à remplacer par les vraies statistiques de
  * DadPrint avant mise en ligne — jamais publier des chiffres inventés.
  */
-export function Hero() {
+export function Hero({ collageImages }: { collageImages: { url: string; alt: string }[] }) {
   const t = useTranslations('home');
+  const [img1, img2, img3, img4] = collageImages;
 
   return (
     <Section className="pt-10 sm:pt-14">
@@ -53,23 +59,31 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Collage — mockups produits variés (cartes, textile, mugs) + carte "Palette du projet" flottante */}
+          {/* Collage — vraies photos produits, sélection différente à chaque chargement */}
           <div className="relative hidden h-[500px] sm:block">
-            <div className="absolute right-0 top-0 w-[58%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-              <Image src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80" alt="Cartes de visite premium DadPrint" width={800} height={600} priority className="aspect-[4/3] w-full object-cover" />
-            </div>
+            {img1 && (
+              <div className="absolute right-0 top-0 w-[58%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
+                <Image src={img1.url} alt={img1.alt} width={800} height={600} priority className="aspect-[4/3] w-full object-cover" />
+              </div>
+            )}
 
-            <div className="absolute left-0 top-[10%] w-[42%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-              <Image src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80" alt="T-shirt personnalisé DadPrint" width={600} height={720} className="aspect-[5/6] w-full object-cover" />
-            </div>
+            {img2 && (
+              <div className="absolute left-0 top-[10%] w-[42%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
+                <Image src={img2.url} alt={img2.alt} width={600} height={720} className="aspect-[5/6] w-full object-cover" />
+              </div>
+            )}
 
-            <div className="absolute left-[6%] bottom-0 w-[36%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-              <Image src="https://images.unsplash.com/photo-1570784332176-fdd73da66f03?w=600&q=80" alt="Mug personnalisé DadPrint" width={600} height={600} className="aspect-square w-full object-cover" />
-            </div>
+            {img3 && (
+              <div className="absolute left-[6%] bottom-0 w-[36%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
+                <Image src={img3.url} alt={img3.alt} width={600} height={600} className="aspect-square w-full object-cover" />
+              </div>
+            )}
 
-            <div className="absolute bottom-[4%] right-[2%] w-[44%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-              <Image src="https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?w=700&q=80" alt="Roll-up et signalétique DadPrint" width={700} height={700} className="aspect-square w-full object-cover" />
-            </div>
+            {img4 && (
+              <div className="absolute bottom-[4%] right-[2%] w-[44%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
+                <Image src={img4.url} alt={img4.alt} width={700} height={700} className="aspect-square w-full object-cover" />
+              </div>
+            )}
 
             <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-1.5 rounded-full bg-white p-2 shadow-card">
               <span className="h-3 w-3 rounded-full" style={{ background: 'var(--color-magenta)' }} />

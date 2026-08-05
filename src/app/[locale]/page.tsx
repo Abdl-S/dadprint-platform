@@ -43,6 +43,22 @@ export default async function HomePage({ params: { locale } }: { params: { local
     getFaq(),
   ]);
 
+  // Sélection aléatoire de 4 vraies photos produits pour le collage du Hero —
+  // différente à chaque chargement de page. Complète avec des photos de secours
+  // vérifiées si moins de 4 produits ont une image (jamais de case vide dans le collage).
+  const fallbackImages = [
+    { url: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80', alt: 'Impression premium DadPrint' },
+    { url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80', alt: 'Impression textile DadPrint' },
+    { url: 'https://images.unsplash.com/photo-1570784332176-fdd73da66f03?w=600&q=80', alt: 'Objets personnalisés DadPrint' },
+    { url: 'https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?w=700&q=80', alt: 'Signalétique DadPrint' },
+  ];
+  const productImages = products
+    .filter((p) => p.images.length > 0)
+    .map((p) => ({ url: p.images[0], alt: p.name[locale] }))
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 4);
+  const collageImages = [...productImages, ...fallbackImages].slice(0, 4);
+
   const localBusinessJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
@@ -57,7 +73,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />
-      <Hero />
+      <Hero collageImages={collageImages} />
       <AboutIntro />
       <Advantages />
       <ServicesOverview />
