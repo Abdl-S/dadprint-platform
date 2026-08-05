@@ -1,19 +1,17 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Container } from '@/components/ui/Container';
-import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 /**
- * Hero — reproduit la direction validée par le client : titre XXL avec un mot
- * mis en évidence, collage photo + carte "Palette du projet" flottante,
- * barre de statistiques sous les CTA.
- *
- * Le collage affiche désormais de vraies photos de produits (choisies côté
- * page d'accueil, différentes à chaque chargement) plutôt que des photos de
- * stock fixes — dès qu'un produit obtient une vraie photo dans l'admin,
- * elle peut apparaître ici.
+ * Hero — diaporama plein écran (option "A" validée par le client), avec de
+ * vraies photos produits en fond (choisies côté page d'accueil, différentes
+ * à chaque chargement — voir `page.tsx`). Le texte reste fixe par-dessus,
+ * un dégradé sombre garde la lisibilité quelle que soit la photo affichée.
  *
  * ⚠️ Les chiffres de `home.stats` (commandes livrées, délai moyen, note de
  * satisfaction) sont des EXEMPLES à remplacer par les vraies statistiques de
@@ -21,79 +19,70 @@ import { buildWhatsAppUrl } from '@/lib/whatsapp';
  */
 export function Hero({ collageImages }: { collageImages: { url: string; alt: string }[] }) {
   const t = useTranslations('home');
-  const [img1, img2, img3, img4] = collageImages;
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (collageImages.length <= 1) return;
+    const interval = setInterval(() => setActive((i) => (i + 1) % collageImages.length), 4500);
+    return () => clearInterval(interval);
+  }, [collageImages.length]);
 
   return (
-    <Section className="pt-10 sm:pt-14">
-      <Container>
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div>
-            <h1 className="text-5xl leading-[1.05] sm:text-6xl lg:text-[4.2rem]">
-              {t('heroLine1')} <span className="text-brand-magenta">{t('heroHighlight')}</span><br />
-              {t('heroLine2')}
-            </h1>
-            <p className="mt-7 max-w-lg text-lg text-ink-70">{t('heroSubtitle')}</p>
+    <section className="relative h-[560px] overflow-hidden sm:h-[640px]">
+      {collageImages.map((img, i) => (
+        <div key={img.url} className={`absolute inset-0 transition-opacity duration-1000 ease-premium ${i === active ? 'opacity-100' : 'opacity-0'}`}>
+          <Image src={img.url} alt={img.alt} fill priority={i === 0} sizes="100vw" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/40 to-ink/10" />
+        </div>
+      ))}
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button href={buildWhatsAppUrl({ intent: 'general' })} variant="magenta" size="lg">
-                {t('ctaWhatsapp')}
-              </Button>
-              <Button href="/realisations" variant="outline" size="lg">
-                {t('ctaSecondary')}
-              </Button>
-            </div>
+      <Container className="relative z-10 flex h-full items-center">
+        <div className="max-w-xl text-paper">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-brand-yellow">DadPrint — Nouakchott</span>
+          <h1 className="mt-3 text-4xl leading-[1.05] sm:text-5xl lg:text-[3.6rem]">
+            {t('heroLine1')} <span className="text-brand-magenta">{t('heroHighlight')}</span><br />
+            {t('heroLine2')}
+          </h1>
+          <p className="mt-6 max-w-md text-lg text-paper/85">{t('heroSubtitle')}</p>
 
-            <div className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
-              <div>
-                <div className="text-3xl font-black">{t('stats.ordersValue')}</div>
-                <div className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-ink-40">{t('stats.ordersLabel')}</div>
-              </div>
-              <div>
-                <div className="text-3xl font-black">{t('stats.delayValue')}</div>
-                <div className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-ink-40">{t('stats.delayLabel')}</div>
-              </div>
-              <div>
-                <div className="text-3xl font-black">{t('stats.satisfactionValue')}</div>
-                <div className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-ink-40">{t('stats.satisfactionLabel')}</div>
-              </div>
-            </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button href={buildWhatsAppUrl({ intent: 'general' })} variant="magenta" size="lg">
+              {t('ctaWhatsapp')}
+            </Button>
+            <Button href="/realisations" variant="outline" size="lg" className="border-paper/40 text-paper hover:bg-paper/10">
+              {t('ctaSecondary')}
+            </Button>
           </div>
 
-          {/* Collage — vraies photos produits, sélection différente à chaque chargement */}
-          <div className="relative hidden h-[500px] sm:block">
-            {img1 && (
-              <div className="absolute right-0 top-0 w-[58%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-                <Image src={img1.url} alt={img1.alt} width={800} height={600} priority className="aspect-[4/3] w-full object-cover" />
-              </div>
-            )}
-
-            {img2 && (
-              <div className="absolute left-0 top-[10%] w-[42%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-                <Image src={img2.url} alt={img2.alt} width={600} height={720} className="aspect-[5/6] w-full object-cover" />
-              </div>
-            )}
-
-            {img3 && (
-              <div className="absolute left-[6%] bottom-0 w-[36%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-                <Image src={img3.url} alt={img3.alt} width={600} height={600} className="aspect-square w-full object-cover" />
-              </div>
-            )}
-
-            {img4 && (
-              <div className="absolute bottom-[4%] right-[2%] w-[44%] overflow-hidden rounded-xl border-4 border-white shadow-raised">
-                <Image src={img4.url} alt={img4.alt} width={700} height={700} className="aspect-square w-full object-cover" />
-              </div>
-            )}
-
-            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-1.5 rounded-full bg-white p-2 shadow-card">
-              <span className="h-3 w-3 rounded-full" style={{ background: 'var(--color-magenta)' }} />
-              <span className="h-3 w-3 rounded-full" style={{ background: 'var(--color-cyan)' }} />
-              <span className="h-3 w-3 rounded-full" style={{ background: 'var(--color-yellow)' }} />
-              <span className="h-3 w-3 rounded-full bg-ink" />
+          <div className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
+            <div>
+              <div className="text-3xl font-black">{t('stats.ordersValue')}</div>
+              <div className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-paper/50">{t('stats.ordersLabel')}</div>
+            </div>
+            <div>
+              <div className="text-3xl font-black">{t('stats.delayValue')}</div>
+              <div className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-paper/50">{t('stats.delayLabel')}</div>
+            </div>
+            <div>
+              <div className="text-3xl font-black">{t('stats.satisfactionValue')}</div>
+              <div className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-paper/50">{t('stats.satisfactionLabel')}</div>
             </div>
           </div>
         </div>
       </Container>
-    </Section>
+
+      {collageImages.length > 1 && (
+        <div className="absolute bottom-7 start-6 z-10 flex gap-2 sm:start-10">
+          {collageImages.map((img, i) => (
+            <button
+              key={img.url}
+              onClick={() => setActive(i)}
+              aria-label={`Photo ${i + 1}`}
+              className={`h-1 rounded-full transition-all duration-300 ${i === active ? 'w-7 bg-brand-yellow' : 'w-3.5 bg-paper/35'}`}
+            />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
