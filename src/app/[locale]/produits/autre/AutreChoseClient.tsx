@@ -54,12 +54,15 @@ export function AutreChoseClient() {
       const { reference: ref, id: orderId } = await res.json();
       setReference(ref);
 
+      const fileLinks: string[] = [];
       if (files.length > 0) {
         const supabase = createClient();
         for (const file of files) {
           const path = `${orderId}/${Date.now()}-${file.name}`;
           const { error: uploadError } = await supabase.storage.from('dp-client-files').upload(path, file);
           if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage.from('dp-client-files').getPublicUrl(path);
+            fileLinks.push(publicUrlData.publicUrl);
             await fetch('/api/orders/files', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ orderId, name: file.name, storagePath: path, mimeType: file.type, sizeBytes: file.size }),
@@ -76,6 +79,7 @@ export function AutreChoseClient() {
           productName: t('whatsappProductLabel'),
           comments: brief,
           delivery: { mode: 'delivery' },
+          fileLinks,
         }),
         '_blank'
       );

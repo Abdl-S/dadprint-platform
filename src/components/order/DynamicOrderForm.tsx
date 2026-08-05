@@ -244,12 +244,15 @@ export function DynamicOrderForm({ product }: { product: Product }) {
 
       // Envoie réellement les fichiers du client vers le stockage, rattachés à ce devis —
       // avant, ces fichiers restaient seulement dans le navigateur et disparaissaient à l'envoi.
+      const fileLinks: string[] = [];
       if (designFiles.length > 0) {
         const supabase = createClient();
         for (const file of designFiles) {
           const path = `${quoteId}/${Date.now()}-${file.name}`;
           const { error: uploadError } = await supabase.storage.from('dp-client-files').upload(path, file);
           if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage.from('dp-client-files').getPublicUrl(path);
+            fileLinks.push(publicUrlData.publicUrl);
             await fetch('/api/quotes/files', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ quoteId, name: file.name, storagePath: path, mimeType: file.type, sizeBytes: file.size }),
@@ -272,6 +275,7 @@ export function DynamicOrderForm({ product }: { product: Product }) {
           })),
           comments: commentsField ? values[commentsField.key] : undefined,
           delivery: { mode: delivery, address, city },
+          fileLinks,
         }),
         '_blank'
       );

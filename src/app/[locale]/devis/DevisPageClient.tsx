@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { FileUpload } from '@/components/order/FileUpload';
 import { DesignChoiceStep } from '@/components/order/DesignChoiceStep';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { createClient } from '@/lib/supabase/client';
 import type { DesignChoice, Locale, Product } from '@/types';
 
 /**
@@ -20,6 +21,9 @@ import type { DesignChoice, Locale, Product } from '@/types';
 export function DevisPageClient({ products, locale }: { products: Product[]; locale: Locale }) {
   const t = useTranslations('quotePage');
   const [designChoice, setDesignChoice] = useState<DesignChoice>('has_design');
+  const [designBrief, setDesignBrief] = useState('');
+  const [designFiles, setDesignFiles] = useState<File[]>([]);
+  const [otherFiles, setOtherFiles] = useState<File[]>([]);
   const [productSlug, setProductSlug] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -56,6 +60,8 @@ export function DevisPageClient({ products, locale }: { products: Product[]; loc
           options: options ? { notes: options } : undefined,
           comments,
           desiredDate: desiredDate || undefined,
+          designChoice,
+          designBrief: designBrief || undefined,
         }),
       });
 
@@ -64,8 +70,29 @@ export function DevisPageClient({ products, locale }: { products: Product[]; loc
         throw new Error(body.error || t('submitError'));
       }
 
-      const { reference: ref } = await res.json();
+      const { reference: ref, id: quoteId } = await res.json();
       setReference(ref);
+
+      // Envoie réellement les fichiers vers le stockage, rattachés à ce devis, et prépare
+      // un lien direct pour chacun — WhatsApp ne joint jamais de fichier automatiquement,
+      // mais un lien cliquable dans le message revient au même en un tap.
+      const fileLinks: string[] = [];
+      const allFiles = [...designFiles, ...otherFiles];
+      if (allFiles.length > 0) {
+        const supabase = createClient();
+        for (const file of allFiles) {
+          const path = `${quoteId}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('dp-client-files').upload(path, file);
+          if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage.from('dp-client-files').getPublicUrl(path);
+            fileLinks.push(publicUrlData.publicUrl);
+            await fetch('/api/quotes/files', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ quoteId, name: file.name, storagePath: path, mimeType: file.type, sizeBytes: file.size }),
+            });
+          }
+        }
+      }
 
       window.open(
         buildWhatsAppUrl({
@@ -76,6 +103,7 @@ export function DevisPageClient({ products, locale }: { products: Product[]; loc
           options: options ? [{ label: t('options'), value: options }] : undefined,
           comments,
           delivery: { mode: 'delivery', address: deliveryAddress || address, city },
+          fileLinks,
         }),
         '_blank'
       );
@@ -152,11 +180,11 @@ export function DevisPageClient({ products, locale }: { products: Product[]; loc
             <input placeholder={t('deliveryAddressPlaceholder')} aria-label={t('deliveryAddress')} value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} className="w-full rounded-md border border-ink-15 p-3" />
           </label>
 
-          <DesignChoiceStep value={designChoice} onChange={setDesignChoice} />
+          <DesignChoiceStep value={designChoice} onChange={setDesignChoice} onFilesChange={setDesignFiles} onBriefChange={setDesignBrief} />
 
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">{t('files')}</span>
-            <FileUpload />
+            <FileUpload onChange={setOtherFiles} />
           </label>
 
           <label className="block text-sm">
