@@ -64,6 +64,21 @@ export async function getAdminInvoices(): Promise<AdminInvoiceRow[]> {
   }));
 }
 
+export interface AdminCompanyRow {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+  websiteUrl: string | null;
+  publishConsent: boolean;
+}
+
+export async function getAdminCompanies(): Promise<AdminCompanyRow[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('dp_companies').select('*').order('created_at', { ascending: false });
+  if (error || !data) return [];
+  return data.map((c) => ({ id: c.id, name: c.name, logoUrl: c.logo_url, websiteUrl: c.website_url, publishConsent: c.publish_consent }));
+}
+
 export interface AdminOrderRow {
   id: string;
   reference: string;

@@ -1,15 +1,45 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
-import { Phone, Mail, MapPin, Clock, Instagram, Facebook } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Instagram, Facebook, CheckCircle2 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
 import { CALL_NUMBER, buildWhatsAppUrl, buildTelUrl } from '@/lib/whatsapp';
 
 export function ContactPageClient() {
   const t = useTranslations('contactPage');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, message: subject ? `[${subject}] ${message}` : message }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Une erreur est survenue.');
+      }
+      setSent(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Une erreur est survenue.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <Section className="pt-12">
@@ -78,19 +108,27 @@ export function ContactPageClient() {
             </div>
           </div>
 
-          <form
-            className="h-fit space-y-4 rounded-lg border border-ink-8 p-6"
-            onSubmit={(e) => e.preventDefault() /* branchement Supabase/edge function à venir */}
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input required placeholder={t('name')} aria-label={t('name')} className="rounded-md border border-ink-15 p-3 text-sm" />
-              <input required type="tel" placeholder={t('phone')} aria-label={t('phone')} className="rounded-md border border-ink-15 p-3 text-sm" />
+          {sent ? (
+            <div className="flex h-fit flex-col items-center justify-center rounded-lg border border-ink-8 p-10 text-center">
+              <CheckCircle2 size={32} className="text-success" />
+              <p className="mt-4 font-bold">Message envoyé !</p>
+              <p className="mt-2 text-sm text-ink-70">Notre équipe vous répond rapidement.</p>
             </div>
-            <input type="email" placeholder={t('email')} aria-label={t('email')} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
-            <input placeholder={t('subject')} aria-label={t('subject')} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
-            <textarea required rows={5} placeholder={t('message')} aria-label={t('message')} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
-            <Button type="submit" variant="magenta" className="w-full">{t('send')}</Button>
-          </form>
+          ) : (
+            <form className="h-fit space-y-4 rounded-lg border border-ink-8 p-6" onSubmit={handleSubmit}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <input required placeholder={t('name')} aria-label={t('name')} value={name} onChange={(e) => setName(e.target.value)} className="rounded-md border border-ink-15 p-3 text-sm" />
+                <input required type="tel" placeholder={t('phone')} aria-label={t('phone')} value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-md border border-ink-15 p-3 text-sm" />
+              </div>
+              <input type="email" placeholder={t('email')} aria-label={t('email')} value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+              <input placeholder={t('subject')} aria-label={t('subject')} value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+              <textarea required rows={5} placeholder={t('message')} aria-label={t('message')} value={message} onChange={(e) => setMessage(e.target.value)} className="w-full rounded-md border border-ink-15 p-3 text-sm" />
+              {submitError && (
+                <p role="alert" className="rounded-md border border-danger/30 bg-danger/5 p-3 text-sm text-danger">{submitError}</p>
+              )}
+              <Button type="submit" variant="magenta" className="w-full" loading={submitting} disabled={submitting}>{t('send')}</Button>
+            </form>
+          )}
         </div>
       </Container>
     </Section>
