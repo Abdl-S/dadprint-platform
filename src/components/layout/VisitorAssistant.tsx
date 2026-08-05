@@ -6,16 +6,18 @@ import { Sparkles, X } from 'lucide-react';
 /**
  * Assistant IA destiné aux visiteurs — emplacement fonctionnel (ouverture/
  * fermeture réelles), contenu non branché à un vrai modèle pour l'instant.
- * Occupe le même emplacement flottant que WhatsApp/Appel, prêt à recevoir
- * une vraie conversation IA sans changer son intégration dans le layout.
+ * Desktop uniquement, comme `FloatingActions` — sur mobile, cette bulle en
+ * plus de la barre du bas rendait la navigation encombrée. Elle réapparaîtra
+ * sur mobile le jour où elle sera vraiment fonctionnelle, avec une vraie
+ * place pensée pour elle plutôt qu'empilée sur les autres actions.
  */
 export function VisitorAssistant() {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <div className="hidden lg:block">
       {open && (
-        <div className="fixed bottom-36 end-5 z-40 w-72 rounded-lg border border-ink-8 bg-white p-4 shadow-raised lg:bottom-24">
+        <div className="fixed bottom-24 end-5 z-40 w-72 rounded-lg border border-ink-8 bg-white p-4 shadow-raised">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles size={15} className="text-brand-magenta" />
@@ -34,10 +36,10 @@ export function VisitorAssistant() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Assistant DadPrint"
-        className="fixed bottom-52 end-5 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-ink text-paper shadow-lg transition-transform hover:scale-105 lg:bottom-[152px]"
+        className="fixed bottom-[152px] end-5 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-ink text-paper shadow-lg transition-transform hover:scale-105"
       >
         <Sparkles size={18} />
       </button>
-    </>
+    </div>
   );
 }
