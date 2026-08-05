@@ -36,8 +36,9 @@ export async function POST(request: Request) {
     await supabase.from('dp_order_lines').insert({ order_id: order.id, product_id: productId, quantity: quantity ?? 1, unit_price: unitPrice ?? null, options: options ?? {} });
   }
 
+  const { data: commercialRole } = await supabase.from('dp_roles').select('id').eq('key', 'commercial').single();
   await supabase.from('dp_notifications').insert({
-    title: 'Nouvelle commande', body: `${reference} — ${name}`, reference, channels: ['app'],
+    title: 'Nouvelle commande', body: `${reference} — ${name}`, reference, channels: ['app'], target_role_id: commercialRole?.id ?? null,
   });
 
   return NextResponse.json({ reference, id: order.id }, { status: 201 });

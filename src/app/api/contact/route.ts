@@ -10,8 +10,9 @@ export async function POST(request: Request) {
   const { error } = await supabase.from('dp_contact_messages').insert({ name, phone: phone || null, email: email || null, message });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  const { data: supportRole } = await supabase.from('dp_roles').select('id').eq('key', 'support').single();
   await supabase.from('dp_notifications').insert({
-    title: 'Nouveau message de contact', body: `${name} — ${message.slice(0, 80)}`, channels: ['app'],
+    title: 'Nouveau message de contact', body: `${name} — ${message.slice(0, 80)}`, channels: ['app'], target_role_id: supportRole?.id ?? null,
   });
 
   return NextResponse.json({ success: true }, { status: 201 });
